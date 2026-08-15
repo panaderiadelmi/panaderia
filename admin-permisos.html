@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Permisos — Delmi Soriano</title>
+    <script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --gold:#F59E0B;--gold-d:#D97706;
+            --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;
+            --border:rgba(245,158,11,0.12);--border-h:rgba(245,158,11,0.35);
+            --t1:#FFF;--t2:#E2E8F0;--t3:#94A3B8;--t4:#475569;
+            --red:#EF4444;--green:#22C55E;
+            --r:12px;--rs:8px;--tr:0.2s ease;
+        }
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t2);min-height:100vh;}
+
+        /* ── LAYOUT ── */
+        .layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 60px);}
+
+        /* ── SIDEBAR ── */
+        .sidebar{
+            background:var(--bg2);border-right:1px solid var(--border);
+            display:flex;flex-direction:column;height:calc(100vh - 60px);
+            position:sticky;top:60px;overflow:hidden;
+        }
+        .sidebar-header{
+            padding:20px;border-bottom:1px solid var(--border);
+            background:rgba(245,158,11,0.03);flex-shrink:0;
+        }
+        .sidebar-title{
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:700;
+            color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;
+        }
+        .sidebar-search{
+            width:100%;padding:8px 12px;background:var(--bg3);
+            border:1px solid var(--border);border-radius:var(--rs);
+            color:var(--t1);font-size:0.82rem;outline:none;
+            font-family:'Inter',sans-serif;transition:var(--tr);
+        }
+        .sidebar-search::placeholder{color:var(--t4);}
+        .sidebar-search:focus{border-color:var(--border-h);}
+
+        .user-list{flex:1;overflow-y:auto;padding:8px;}
+        .user-list::-webkit-scrollbar{width:4px;}
+        .user-list::-webkit-scrollbar-track{background:transparent;}
+        .user-list::-webkit-scrollbar-thumb{background:rgba(245,158,11,0.2);border-radius:2px;}
+
+        .user-list-item{
+            display:flex;align-items:center;gap:10px;
+            padding:10px 12px;border-radius:var(--rs);
+            cursor:pointer;transition:var(--tr);border:1px solid transparent;
+            margin-bottom:2px;
+        }
+        .user-list-item:hover{background:rgba(255,255,255,0.04);}
+        .user-list-item.active{
+            background:rgba(245,158,11,0.08);
+            border-color:rgba(245,158,11,0.25);
+        }
+        .ul-avatar{
+            width:34px;height:34px;border-radius:50%;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.7rem;font-weight:800;
+        }
+        .ul-info{flex:1;min-width:0;}
+        .ul-name{
+            font-size:0.82rem;font-weight:600;color:var(--t1);
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        }
+        .ul-role{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+
+        .ul-badge{
+            width:8px;height:8px;border-radius:50%;flex-shrink:0;
+            background:var(--gold);box-shadow:0 0 6px rgba(245,158,11,0.5);
+            display:none;
+        }
+        .ul-badge.show{display:block;}
+
+        /* ── CONTENT ── */
+        .content{padding:32px;overflow-y:auto;}
+
+        /* Empty state */
+        .empty-content{
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            height:60vh;color:var(--t4);text-align:center;gap:16px;
+        }
+        .empty-content-icon{font-size:4rem;}
+        .empty-content h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;color:var(--t3);}
+
+        /* ── USER HEADER ── */
+        .user-header{
+            display:flex;align-items:center;gap:20px;
+            padding:24px;background:var(--bg2);
+            border:1px solid var(--border);border-radius:var(--r);
+            margin-bottom:24px;
+        }
+        .uh-avatar{
+            width:56px;height:56px;border-radius:50%;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:800;
+        }
+        .uh-info{flex:1;}
+        .uh-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:700;color:var(--t1);}
+        .uh-email{font-size:0.82rem;color:var(--t3);margin-top:2px;}
+        .uh-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+
+        .role-chip{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:4px 12px;border-radius:999px;
+            font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+        }
+
+        .custom-badge{
+            display:inline-flex;align-items:center;gap:4px;
+            padding:3px 10px;border-radius:999px;
+            font-size:0.68rem;font-weight:700;
+            background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);
+            color:var(--gold);
+        }
+
+        .status-chip{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:3px 10px;border-radius:999px;font-size:0.68rem;font-weight:600;
+        }
+        .status-chip.active{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);}
+        .status-chip.inactive{background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.2);color:var(--t4);}
+
+        /* ── ROLE SELECTOR ── */
+        .section-card{
+            background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+            margin-bottom:20px;overflow:hidden;
+        }
+        .sc-header{
+            padding:16px 20px;border-bottom:1px solid var(--border);
+            background:rgba(245,158,11,0.03);
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .sc-title{
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:700;color:var(--t1);
+            display:flex;align-items:center;gap:8px;
+        }
+        .sc-subtitle{font-size:0.75rem;color:var(--t3);margin-top:2px;}
+        .sc-body{padding:20px;}
+
+        .role-selector{
+            display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;
+        }
+        .role-option{
+            padding:12px;border-radius:var(--rs);border:1px solid;
+            cursor:pointer;transition:var(--tr);text-align:center;
+        }
+        .role-option-emoji{font-size:1.6rem;line-height:1;margin-bottom:6px;}
+        .role-option-label{
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;
+            text-transform:uppercase;letter-spacing:0.05em;
+        }
+        .role-option-count{font-size:0.65rem;color:var(--t3);margin-top:2px;}
+        .role-option.selected{opacity:1;}
+        .role-option:not(.selected){
+            opacity:0.5;cursor:pointer;
+            border-color:rgba(255,255,255,0.08)!important;
+            background:rgba(255,255,255,0.02)!important;
+            color:var(--t3)!important;
+        }
+        .role-option:not(.selected):hover{opacity:0.8;}
+
+        /* ── PERMISSION TOGGLES ── */
+        .perm-grid{display:flex;flex-direction:column;gap:10px;}
+
+        .perm-row{
+            display:flex;align-items:center;gap:16px;
+            padding:14px 16px;border-radius:var(--rs);
+            border:1px solid;transition:var(--tr);
+        }
+        .perm-row.granted{
+            background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.2);
+        }
+        .perm-row.revoked{
+            background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.12);
+            opacity:0.6;
+        }
+        .perm-emoji{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center;}
+        .perm-info{flex:1;min-width:0;}
+        .perm-label{
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:600;
+            color:var(--t1);
+        }
+        .perm-desc{font-size:0.75rem;color:var(--t3);margin-top:2px;}
+
+        /* Source badge */
+        .perm-source{
+            font-size:0.62rem;font-weight:700;text-transform:uppercase;
+            letter-spacing:0.06em;padding:2px 8px;border-radius:999px;flex-shrink:0;
+        }
+        .perm-source.from-role{background:rgba(148,163,184,0.1);color:var(--t3);}
+        .perm-source.from-grant{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+        .perm-source.from-revoke{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red);}
+
+        /* Toggle switch */
+        .toggle-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+        .toggle{position:relative;width:44px;height:24px;}
+        .toggle input{opacity:0;width:0;height:0;position:absolute;}
+        .toggle-track{
+            position:absolute;inset:0;
+            background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+            border-radius:999px;cursor:pointer;transition:var(--tr);
+        }
+        .toggle-track::before{
+            content:'';position:absolute;
+            width:18px;height:18px;border-radius:50%;
+            background:var(--t4);left:3px;top:50%;
+            transform:translateY(-50%);transition:var(--tr);
+        }
+        .toggle input:checked+.toggle-track{background:rgba(34,197,94,0.2);border-color:var(--green);}
+        .toggle input:checked+.toggle-track::before{background:var(--green);transform:translate(18px,-50%);}
+
+        /* ── DIFF INDICATORS ── */
+        .diff-badge{
+            display:inline-flex;align-items:center;gap:4px;
+            font-size:0.65rem;font-weight:700;padding:2px 8px;
+            border-radius:999px;border:1px solid;
+        }
+        .diff-added{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green);}
+        .diff-removed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:var(--red);}
+
+        /* ── ACTION BUTTONS ── */
+        .action-bar{
+            display:flex;gap:10px;align-items:center;
+            padding:16px 20px;border-top:1px solid var(--border);
+            background:rgba(0,0,0,0.3);flex-wrap:wrap;
+        }
+        .btn-save{
+            padding:10px 22px;
+            background:linear-gradient(135deg,var(--gold-d),var(--gold));
+            border:none;border-radius:var(--rs);color:#fff;
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.875rem;font-weight:700;
+            cursor:pointer;transition:var(--tr);
+        }
+        .btn-save:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,0.4);}
+
+        .btn-reset-ovr{
+            padding:10px 18px;background:transparent;
+            border:1px solid rgba(239,68,68,0.25);border-radius:var(--rs);color:var(--red);
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:600;
+            cursor:pointer;transition:var(--tr);
+        }
+        .btn-reset-ovr:hover{background:rgba(239,68,68,0.08);border-color:var(--red);}
+
+        .btn-cancel-sec{
+            padding:10px 18px;background:transparent;
+            border:1px solid rgba(255,255,255,0.1);border-radius:var(--rs);color:var(--t3);
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:600;
+            cursor:pointer;transition:var(--tr);margin-left:auto;
+        }
+        .btn-cancel-sec:hover{background:rgba(255,255,255,0.05);}
+
+        /* ── MATRIX TABLE ── */
+        .matrix-wrap{
+            background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+            overflow:auto;
+        }
+        .matrix-hdr{
+            padding:18px 20px;border-bottom:1px solid var(--border);
+            background:rgba(245,158,11,0.03);
+        }
+        .matrix-hdr h2{
+            font-family:'Plus Jakarta Sans',sans-serif;font-size:0.95rem;font-weight:700;color:var(--t1);
+        }
+        .mtable{width:100%;border-collapse:collapse;min-width:600px;}
+        .mtable th{
+            padding:11px 14px;font-size:0.65rem;font-weight:700;text-transform:uppercase;
+            letter-spacing:0.08em;color:var(--t4);border-bottom:1px solid rgba(255,255,255,0.05);
+            text-align:center;white-space:nowrap;
+        }
+        .mtable th:first-child{text-align:left;min-width:180px;}
+        .mtable td{
+            padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.03);
+            text-align:center;font-size:0.78rem;
+        }
+        .mtable td:first-child{text-align:left;}
+        .mtable tr:last-child td{border-bottom:none;}
+        .mtable tr:hover td{background:rgba(255,255,255,0.02);}
+        .m-yes{font-size:0.9rem;}
+        .m-no{color:var(--t4);font-size:0.8rem;}
+        .m-custom{font-size:0.7rem;padding:1px 6px;border-radius:4px;display:inline-block;}
+        .m-custom.g{background:rgba(34,197,94,0.15);color:var(--green);}
+        .m-custom.r{background:rgba(239,68,68,0.12);color:var(--red);}
+
+        /* ── TOAST ── */
+        .toasts{position:fixed;bottom:24px;right:24px;z-index:900;display:flex;flex-direction:column;gap:8px;}
+        .toast{
+            padding:12px 18px;border-radius:var(--rs);font-size:0.875rem;font-weight:600;
+            color:#fff;display:flex;align-items:center;gap:8px;
+            animation:tin 0.3s ease forwards;box-shadow:0 8px 24px rgba(0,0,0,0.5);
+        }
+        .toast.ok{background:linear-gradient(135deg,#15803d,#22c55e);}
+        .toast.err{background:linear-gradient(135deg,#991b1b,#ef4444);}
+        .toast.inf{background:linear-gradient(135deg,#92400e,var(--gold));}
+        @keyframes tin{from{opacity:0;transform:translateY(10px) scale(0.95)}to{opacity:1;transform:none}}
+
+        @media(max-width:900px){
+            .layout{grid-template-columns:1fr;}
+            .sidebar{position:static;height:auto;max-height:300px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ══ SIDEBAR: LISTA DE USUARIOS ══ -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">🔐 Usuarios</div>
+            <input class="sidebar-search" id="sidebar-search" placeholder="Buscar usuario...">
+        </div>
+        <div class="user-list" id="user-list"></div>
+    </aside>
+
+    <!-- ══ CONTENT: EDITOR DE PERMISOS ══ -->
+    <div class="content" id="content">
+        <div class="empty-content" id="empty-state">
+            <div class="empty-content-icon">🔐</div>
+            <h2>Selecciona un usuario</h2>
+            <p style="font-size:0.875rem;color:var(--t4);">Elige un usuario de la lista para editar sus permisos.</p>
+        </div>
+        <div id="editor" style="display:none;"></div>
+    </div>
+
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+    /* ── AUTH CHECK ──────────────────────────────────── */
+    if (!DS_AUTH.requireAuth('admin_usuarios')) { /* redirige */ }
+    DS_AUTH.renderAdminNav('admin-permisos.html');
+
+    /* ── ESTADO ──────────────────────────────────────── */
+    const ROLES    = DS_AUTH.ROLES;
+    const ALL_PERMS = DS_AUTH.ALL_PERMS;
+    let users      = [];
+    let overrides  = {};
+    let selectedId = null;
+    let pendingPerms = null; // permisos editados en pantalla (no guardados aún)
+
+    function load() {
+        users     = DS_AUTH.getUsers();
+        overrides = DS_AUTH.getOverrides();
+    }
+
+    /* ── RENDER SIDEBAR ──────────────────────────────── */
+    function renderSidebar(filter = '') {
+        const term = filter.toLowerCase();
+        const list = document.getElementById('user-list');
+        const filtered = users.filter(u =>
+            (u.nombre + ' ' + u.apellido + ' ' + u.email + ' ' + u.rol).toLowerCase().includes(term)
+        );
+
+        if (!filtered.length) {
+            list.innerHTML = `<p style="text-align:center;color:var(--t4);padding:24px;font-size:0.8rem;">Sin resultados</p>`;
+            return;
+        }
+
+        list.innerHTML = filtered.map(u => {
+            const role     = ROLES[u.rol] || {};
+            const initials = (u.nombre[0] + (u.apellido?.[0] || '')).toUpperCase();
+            const hasOvr   = DS_AUTH.userHasOverrides(u.id);
+            return `
+            <div class="user-list-item ${selectedId === u.id ? 'active' : ''}"
+                 onclick="selectUser('${u.id}')">
+                <div class="ul-avatar"
+                     style="background:${role.bg};border:1px solid ${role.border};color:${role.color}">
+                    ${initials}
+                </div>
+                <div class="ul-info">
+                    <div class="ul-name">${u.nombre} ${u.apellido}</div>
+                    <div class="ul-role" style="color:${role.color}">${role.emoji} ${role.label}</div>
+                </div>
+                <div class="ul-badge ${hasOvr ? 'show' : ''}" title="Permisos personalizados"></div>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── SELECCIONAR USUARIO ─────────────────────────── */
+    function selectUser(id) {
+        selectedId  = id;
+        pendingPerms = null; // reset pending changes
+        renderSidebar(document.getElementById('sidebar-search').value);
+        renderEditor();
+    }
+
+    /* ── RENDER EDITOR ───────────────────────────────── */
+    function renderEditor() {
+        document.getElementById('empty-state').style.display = 'none';
+        const editor = document.getElementById('editor');
+        editor.style.display = 'block';
+
+        const u        = users.find(u => u.id === selectedId);
+        if (!u) return;
+        const role     = ROLES[u.rol] || {};
+        const initials = (u.nombre[0] + (u.apellido?.[0] || '')).toUpperCase();
+        const hasOvr   = DS_AUTH.userHasOverrides(u.id);
+        const effPerms = pendingPerms || DS_AUTH.getUserEffectivePerms(u.id);
+        const rolePerms= ROLES[u.rol]?.permisos || [];
+        const ovr      = overrides[u.id] || {grants:[],revokes:[]};
+
+        /* ── USER HEADER ── */
+        editor.innerHTML = `
+        <!-- User Header -->
+        <div class="user-header">
+            <div class="uh-avatar"
+                 style="background:${role.bg};border:2px solid ${role.border};color:${role.color}">
+                ${initials}
+            </div>
+            <div class="uh-info">
+                <div class="uh-name">${u.nombre} ${u.apellido}</div>
+                <div class="uh-email">${u.email}</div>
+                <div class="uh-meta">
+                    <span class="role-chip" style="background:${role.bg};border:1px solid ${role.border};color:${role.color}">
+                        ${role.emoji} ${role.label}
+                    </span>
+                    <span class="status-chip ${u.activo ? 'active' : 'inactive'}">
+                        ${u.activo ? '● Activo' : '● Inactivo'}
+                    </span>
+                    ${hasOvr ? `<span class="custom-badge">⚡ Permisos personalizados</span>` : ''}
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: Cambiar Rol -->
+        <div class="section-card">
+            <div class="sc-header">
+                <div>
+                    <div class="sc-title">👑 Rol base</div>
+                    <div class="sc-subtitle">El rol determina los permisos por defecto. Selecciona uno para aplicarlo.</div>
+                </div>
+            </div>
+            <div class="sc-body">
+                <div class="role-selector">
+                    ${Object.entries(ROLES).map(([r, info]) => `
+                    <div class="role-option ${u.rol === r ? 'selected' : ''}"
+                         style="background:${u.rol===r?info.bg:'transparent'};
+                                border-color:${u.rol===r?info.border:'rgba(255,255,255,0.08)'};
+                                color:${u.rol===r?info.color:'var(--t3)'}"
+                         onclick="changeRole('${r}')">
+                        <div class="role-option-emoji">${info.emoji}</div>
+                        <div class="role-option-label">${info.label}</div>
+                        <div class="role-option-count">${info.permisos.length} permisos</div>
+                    </div>`).join('')}
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: Permisos individuales -->
+        <div class="section-card">
+            <div class="sc-header">
+                <div>
+                    <div class="sc-title">🔐 Permisos individuales
+                        <span id="diff-badges" style="display:flex;gap:5px;"></span>
+                    </div>
+                    <div class="sc-subtitle">Ajusta permisos concretos sobre el rol base. Los cambios se marcan con ⚡.</div>
+                </div>
+            </div>
+            <div class="sc-body">
+                <div class="perm-grid" id="perm-grid"></div>
+            </div>
+            <div class="action-bar">
+                <button class="btn-save" onclick="saveChanges()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Guardar cambios
+                </button>
+                <button class="btn-reset-ovr" onclick="resetOverrides()">
+                    ↺ Restaurar rol por defecto
+                </button>
+                <button class="btn-cancel-sec" onclick="cancelChanges()">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- MATRIX GLOBAL -->
+        <div class="matrix-wrap" style="margin-top:24px;">
+            <div class="matrix-hdr">
+                <h2>📊 Vista global de permisos</h2>
+                <p style="font-size:0.78rem;color:var(--t3);margin-top:4px;">
+                    ✦ = por rol &nbsp;⊕ = concedido extra &nbsp;⊗ = revocado &nbsp;— = sin acceso
+                </p>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="mtable" id="matrix-table"></table>
+            </div>
+        </div>`;
+
+        renderPermGrid(effPerms, rolePerms, ovr);
+        renderDiffBadges(rolePerms, effPerms);
+        renderMatrix();
+    }
+
+    /* ── RENDER PERMISSION GRID ──────────────────────── */
+    function renderPermGrid(effPerms, rolePerms, ovr) {
+        const grid = document.getElementById('perm-grid');
+        if (!grid) return;
+
+        grid.innerHTML = ALL_PERMS.map(p => {
+            const isGranted  = effPerms.includes(p.key);
+            const fromRole   = rolePerms.includes(p.key);
+            const isExtra    = !fromRole && isGranted;  // granted by override
+            const isRevoked  = fromRole && !isGranted;  // revoked by override
+
+            let sourceLabel = '';
+            if (isExtra)   sourceLabel = `<span class="perm-source from-grant">⊕ Extra</span>`;
+            else if (isRevoked) sourceLabel = `<span class="perm-source from-revoke">⊗ Revocado</span>`;
+            else if (fromRole)  sourceLabel = `<span class="perm-source from-role">Rol base</span>`;
+
+            return `
+            <div class="perm-row ${isGranted ? 'granted' : 'revoked'}" id="prow-${p.key}">
+                <div class="perm-emoji">${p.emoji}</div>
+                <div class="perm-info">
+                    <div class="perm-label">${p.label}</div>
+                    <div class="perm-desc">${p.desc}</div>
+                </div>
+                ${sourceLabel}
+                <label class="toggle" title="${isGranted ? 'Quitar permiso' : 'Conceder permiso'}">
+                    <input type="checkbox" ${isGranted ? 'checked' : ''}
+                           onchange="togglePerm('${p.key}', this.checked)">
+                    <div class="toggle-track"></div>
+                </label>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── RENDER DIFF BADGES ──────────────────────────── */
+    function renderDiffBadges(rolePerms, effPerms) {
+        const container = document.getElementById('diff-badges');
+        if (!container) return;
+        const added   = effPerms.filter(p => !rolePerms.includes(p));
+        const removed = rolePerms.filter(p => !effPerms.includes(p));
+        container.innerHTML = [
+            added.length   ? `<span class="diff-badge diff-added">+${added.length} extra</span>` : '',
+            removed.length ? `<span class="diff-badge diff-removed">−${removed.length} revocado${removed.length>1?'s':''}</span>` : ''
+        ].join('');
+    }
+
+    /* ── TOGGLE INDIVIDUAL PERMISSION ────────────────── */
+    function togglePerm(permKey, granted) {
+        const u       = users.find(u => u.id === selectedId);
+        if (!u) return;
+
+        // Inicializar pending desde el estado actual
+        if (!pendingPerms) pendingPerms = [...DS_AUTH.getUserEffectivePerms(u.id)];
+
+        if (granted) {
+            if (!pendingPerms.includes(permKey)) pendingPerms.push(permKey);
+        } else {
+            pendingPerms = pendingPerms.filter(p => p !== permKey);
+        }
+
+        const rolePerms = ROLES[u.rol]?.permisos || [];
+        const ovr       = overrides[u.id] || {grants:[],revokes:[]};
+
+        // Actualizar visual de la fila
+        const row = document.getElementById(`prow-${permKey}`);
+        if (row) {
+            row.className = `perm-row ${granted ? 'granted' : 'revoked'}`;
+        }
+
+        renderDiffBadges(rolePerms, pendingPerms);
+    }
+
+    /* ── CHANGE ROLE ─────────────────────────────────── */
+    function changeRole(newRole) {
+        const u = users.find(u => u.id === selectedId);
+        if (!u || u.rol === newRole) return;
+
+        u.rol = newRole;
+        DS_AUTH.saveUsers(users);
+
+        // Limpiar overrides al cambiar el rol
+        delete overrides[u.id];
+        DS_AUTH.saveOverrides(overrides);
+        pendingPerms = null;
+
+        toast(`✅ Rol cambiado a "${ROLES[newRole]?.label}"`, 'ok');
+        renderSidebar(document.getElementById('sidebar-search').value);
+        renderEditor();
+    }
+
+    /* ── SAVE CHANGES ────────────────────────────────── */
+    function saveChanges() {
+        if (!selectedId || !pendingPerms) { toast('Sin cambios que guardar', 'inf'); return; }
+
+        const u         = users.find(u => u.id === selectedId);
+        const rolePerms = ROLES[u.rol]?.permisos || [];
+
+        const grants  = pendingPerms.filter(p => !rolePerms.includes(p));
+        const revokes = rolePerms.filter(p => !pendingPerms.includes(p));
+
+        if (grants.length === 0 && revokes.length === 0) {
+            // Permisos == rol base → borrar overrides
+            delete overrides[selectedId];
+        } else {
+            overrides[selectedId] = { grants, revokes };
+        }
+
+        DS_AUTH.saveOverrides(overrides);
+        pendingPerms = null;
+        toast('✅ Permisos guardados correctamente', 'ok');
+        renderSidebar(document.getElementById('sidebar-search').value);
+        renderEditor();
+    }
+
+    /* ── RESET OVERRIDES ─────────────────────────────── */
+    function resetOverrides() {
+        if (!selectedId) return;
+        delete overrides[selectedId];
+        DS_AUTH.saveOverrides(overrides);
+        pendingPerms = null;
+        toast('↺ Permisos restaurados al rol base', 'inf');
+        renderSidebar(document.getElementById('sidebar-search').value);
+        renderEditor();
+    }
+
+    /* ── CANCEL ──────────────────────────────────────── */
+    function cancelChanges() {
+        pendingPerms = null;
+        renderEditor();
+        toast('Cambios descartados', 'inf');
+    }
+
+    /* ── RENDER GLOBAL MATRIX ────────────────────────── */
+    function renderMatrix() {
+        const table = document.getElementById('matrix-table');
+        if (!table) return;
+
+        const thead = `<thead><tr>
+            <th>Usuario</th>
+            ${ALL_PERMS.map(p => `<th title="${p.desc}">${p.emoji}<br><span style="font-size:0.58rem">${p.label.split(' ')[0]}</span></th>`).join('')}
+        </tr></thead>`;
+
+        const rows = users.map(u => {
+            const rolePerms = ROLES[u.rol]?.permisos || [];
+            const effPerms  = DS_AUTH.getUserEffectivePerms(u.id);
+            const role      = ROLES[u.rol] || {};
+            const initials  = (u.nombre[0] + (u.apellido?.[0] || '')).toUpperCase();
+
+            return `<tr ${selectedId===u.id ? 'style="background:rgba(245,158,11,0.04)"' : ''}>
+                <td>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;
+                                    display:flex;align-items:center;justify-content:center;
+                                    background:${role.bg};border:1px solid ${role.border};
+                                    color:${role.color};font-size:0.62rem;font-weight:800;
+                                    font-family:'Plus Jakarta Sans',sans-serif;">
+                            ${initials}
+                        </div>
+                        <div>
+                            <div style="font-size:0.8rem;font-weight:600;color:var(--t1);white-space:nowrap">${u.nombre}</div>
+                            <div style="font-size:0.62rem;color:${role.color};font-weight:700;text-transform:uppercase;letter-spacing:0.05em">${role.label}</div>
+                        </div>
+                    </div>
+                </td>
+                ${ALL_PERMS.map(p => {
+                    const fromRole  = rolePerms.includes(p.key);
+                    const effective = effPerms.includes(p.key);
+                    const isExtra   = !fromRole && effective;
+                    const isRevoked = fromRole && !effective;
+                    if (isExtra)   return `<td><span class="m-custom g" title="Concedido extra">⊕</span></td>`;
+                    if (isRevoked) return `<td><span class="m-custom r" title="Revocado">⊗</span></td>`;
+                    if (effective) return `<td><span class="m-yes" style="color:${role.color}" title="Por rol">✦</span></td>`;
+                    return `<td><span class="m-no">—</span></td>`;
+                }).join('')}
+            </tr>`;
+        }).join('');
+
+        table.innerHTML = thead + `<tbody>${rows}</tbody>`;
+    }
+
+    /* ── TOAST ───────────────────────────────────────── */
+    function toast(msg, type = 'inf', ms = 3200) {
+        const c  = document.getElementById('toasts');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.textContent = msg;
+        c.appendChild(el);
+        setTimeout(() => el.remove(), ms);
+    }
+
+    /* ── EVENTOS ─────────────────────────────────────── */
+    document.getElementById('sidebar-search').addEventListener('input', e => {
+        renderSidebar(e.target.value);
+    });
+
+    /* ── INICIO ──────────────────────────────────────── */
+    load();
+    renderSidebar();
+    // Seleccionar primer usuario automáticamente
+    if (users.length) selectUser(users[0].id);
+</script>
+</body>
+</html>

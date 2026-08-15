@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuth() && request.auth.token.rol == 'administrador';
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    function isValidEmail(email) {
+      return email.matches('^[^@]+@[^@]+\\.[^@]+$');
+    }
+
+    // ── Productos ────────────────────────────────────────────────────────────
+    // Lectura pública; escritura solo admin
+    match /productos/{productoId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Categorías ───────────────────────────────────────────────────────────
+    match /categorias/{categoriaId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Configuración de empresa ─────────────────────────────────────────────
+    // Lectura pública (datos de contacto, horarios); escritura solo admin
+    match /configuracion/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Pedidos ──────────────────────────────────────────────────────────────
+    // Cliente ve/crea sus propios pedidos; admin ve y actualiza todos
+    match /pedidos/{pedidoId} {
+      allow read: if isAdmin()
+        || (isAuth() && resource.data.clienteId == request.auth.uid);
+
+      allow create: if isAuth()
+        && request.resource.data.clienteId == request.auth.uid
+        && request.resource.data.total > 0
+        && request.resource.data.lineas.size() > 0;
+
+      // Solo admin cambia estados y agrega notas internas
+      allow update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+    // ── Clientes (perfiles extendidos) ───────────────────────────────────────
+    // Cada usuario lee/edita su propio perfil; admin accede a todos
+    match /clientes/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && isValidEmail(request.resource.data.email);
+
+      allow update: if isOwner(uid)
+        // El cliente no puede cambiar su propio rol
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['rol']))
+        || isAdmin();
+
+      allow delete: if false; // Baja gestionada por Cloud Function (anonimización)
+    }
+
+    // ── Facturas ─────────────────────────────────────────────────────────────
+    // Solo lectura para el cliente propietario y para admin.
+    // Escritura exclusiva de Cloud Functions (no desde el cliente).
+    match /facturas/{facturaId} {
+      allow read: if isAdmin()
+        || (isAuth() && resource.data.clienteId == request.auth.uid);
+
+      allow write: if false;
+    }
+
+    // ── Franjas horarias ─────────────────────────────────────────────────────
+    // Lectura pública (checkout las necesita); escritura solo admin
+    match /franjas/{franjaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+  }
+}

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios — Delmi Soriano</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+        :root{
+            --gold:#F59E0B; --gold-d:#D97706;
+            --bg:#000; --bg2:#0a0a0a; --bg3:#111; --bg4:#1a1a1a;
+            --border:rgba(245,158,11,0.12); --border-h:rgba(245,158,11,0.35);
+            --t1:#FFF; --t2:#E2E8F0; --t3:#94A3B8; --t4:#475569;
+            --red:#EF4444; --green:#22C55E;
+            --r:12px; --rs:8px;
+            --tr:0.2s ease;
+        }
+
+        body{font-family:'Inter',sans-serif; background:var(--bg); color:var(--t2); min-height:100vh;}
+
+        .main{max-width:1200px; margin:0 auto; padding:40px 24px 80px;}
+
+        /* ── STATS ── */
+        .stats-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:32px;}
+        .stat{
+            display:flex; align-items:center; gap:12px;
+            padding:16px 20px;
+            background:var(--bg3); border:1px solid var(--border); border-radius:var(--r);
+            flex:1; min-width:160px;
+        }
+        .stat-icon{font-size:1.6rem;}
+        .stat-num{font-family:'Plus Jakarta Sans',sans-serif; font-size:1.6rem; font-weight:800; color:var(--gold); line-height:1;}
+        .stat-lbl{font-size:0.7rem; color:var(--t3); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px;}
+
+        /* ── TOOLBAR ── */
+        .toolbar{display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; align-items:center;}
+
+        .search-wrap{position:relative; flex:1; min-width:200px;}
+        .search-ico{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--t4); pointer-events:none;}
+        .search-inp{
+            width:100%; padding:10px 14px 10px 38px;
+            background:var(--bg3); border:1px solid var(--border); border-radius:var(--rs);
+            color:var(--t1); font-size:0.875rem; outline:none; transition:var(--tr);
+            font-family:'Inter',sans-serif;
+        }
+        .search-inp::placeholder{color:var(--t4);}
+        .search-inp:focus{border-color:var(--border-h); background:var(--bg4);}
+
+        /* ROLE FILTER PILLS */
+        .role-filters{display:flex; gap:6px; flex-wrap:wrap;}
+        .role-pill{
+            padding:6px 14px; border-radius:999px; font-size:0.72rem; font-weight:700;
+            cursor:pointer; border:1px solid; transition:var(--tr);
+            text-transform:uppercase; letter-spacing:0.05em;
+            background:transparent; font-family:'Plus Jakarta Sans',sans-serif;
+        }
+        .role-pill:not(.active){color:var(--t3); border-color:rgba(255,255,255,0.1);}
+        .role-pill:not(.active):hover{color:var(--t2); border-color:rgba(255,255,255,0.2);}
+
+        /* ── TABLE ── */
+        .table-wrap{
+            background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+            overflow:hidden;
+        }
+
+        .table-head{
+            display:grid; grid-template-columns:2.5fr 2fr 1.5fr 1fr 1fr 120px;
+            gap:0; padding:13px 20px;
+            background:rgba(245,158,11,0.04);
+            border-bottom:1px solid var(--border);
+            font-size:0.68rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:0.09em; color:var(--t4);
+        }
+
+        .user-row{
+            display:grid; grid-template-columns:2.5fr 2fr 1.5fr 1fr 1fr 120px;
+            gap:0; padding:14px 20px;
+            border-bottom:1px solid rgba(255,255,255,0.04);
+            align-items:center; transition:var(--tr);
+        }
+        .user-row:last-child{border-bottom:none;}
+        .user-row:hover{background:rgba(255,255,255,0.02);}
+        .user-row.inactive{opacity:0.45;}
+
+        .user-info{display:flex; align-items:center; gap:12px;}
+        .user-avatar{
+            width:36px; height:36px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; font-weight:800;
+            flex-shrink:0;
+        }
+        .user-name{font-size:0.875rem; font-weight:600; color:var(--t1);}
+        .user-email{font-size:0.75rem; color:var(--t3); margin-top:1px;}
+
+        .role-tag{
+            display:inline-flex; align-items:center; gap:5px;
+            padding:4px 10px; border-radius:999px;
+            font-size:0.68rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:0.05em;
+        }
+
+        .status-dot{
+            width:8px; height:8px; border-radius:50%;
+            display:inline-block; margin-right:6px;
+        }
+
+        .status-text{font-size:0.8rem; font-weight:600;}
+        .active-true .status-dot{background:var(--green);}
+        .active-true .status-text{color:var(--green);}
+        .active-false .status-dot{background:var(--t4);}
+        .active-false .status-text{color:var(--t4);}
+
+        .date-cell{font-size:0.78rem; color:var(--t4);}
+
+        .actions-cell{display:flex; gap:6px; justify-content:flex-end;}
+
+        .btn-icon{
+            width:30px; height:30px; border-radius:var(--rs);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; border:1px solid; transition:var(--tr); background:transparent;
+        }
+        .btn-edit-user{border-color:rgba(245,158,11,0.2); color:var(--gold);}
+        .btn-edit-user:hover{background:rgba(245,158,11,0.1); border-color:var(--gold);}
+        .btn-toggle{border-color:rgba(74,222,128,0.2); color:var(--green);}
+        .btn-toggle:hover{background:rgba(74,222,128,0.1); border-color:var(--green);}
+        .btn-toggle.is-active{border-color:rgba(239,68,68,0.2); color:var(--red);}
+        .btn-toggle.is-active:hover{background:rgba(239,68,68,0.1); border-color:var(--red);}
+        .btn-del{border-color:rgba(239,68,68,0.2); color:var(--red);}
+        .btn-del:hover{background:rgba(239,68,68,0.1); border-color:var(--red);}
+
+        /* ── EMPTY ── */
+        .empty{padding:60px 20px; text-align:center; color:var(--t4);}
+        .empty-ico{font-size:3rem; margin-bottom:12px;}
+
+        /* ── PERMISOS MATRIX ── */
+        .matrix-section{
+            margin-top:40px;
+            background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+            overflow:hidden;
+        }
+        .matrix-header{
+            padding:20px 24px; border-bottom:1px solid var(--border);
+            background:rgba(245,158,11,0.04);
+        }
+        .matrix-title{
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:1rem; font-weight:700; color:var(--t1);
+        }
+        .matrix-subtitle{font-size:0.8rem; color:var(--t3); margin-top:4px;}
+
+        .matrix-table{width:100%; border-collapse:collapse;}
+        .matrix-table th{
+            padding:12px 16px; font-size:0.68rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:0.08em; color:var(--t4);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            text-align:center;
+        }
+        .matrix-table th:first-child{text-align:left;}
+        .matrix-table td{
+            padding:12px 16px;
+            border-bottom:1px solid rgba(255,255,255,0.03);
+            text-align:center; font-size:0.82rem;
+        }
+        .matrix-table td:first-child{text-align:left; color:var(--t2); font-weight:500;}
+        .matrix-table tr:last-child td{border-bottom:none;}
+        .matrix-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+        .perm-yes{font-size:1rem;}
+        .perm-no{font-size:0.9rem; color:var(--t4);}
+
+        /* ── SECTION HEADING ── */
+        .section-row{
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:16px; flex-wrap:wrap; gap:10px;
+        }
+        .section-row h2{
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:1rem; font-weight:700; color:var(--t1);
+        }
+        .count-badge{
+            font-size:0.68rem; padding:3px 10px; border-radius:999px;
+            background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2);
+            color:var(--gold); font-weight:700;
+        }
+
+        /* ── MODAL ── */
+        .overlay{
+            position:fixed; inset:0; background:rgba(0,0,0,0.88);
+            backdrop-filter:blur(6px); z-index:500;
+            display:flex; align-items:flex-start; justify-content:center;
+            padding:40px 16px; overflow-y:auto;
+            opacity:0; pointer-events:none; transition:opacity 0.25s;
+        }
+        .overlay.open{opacity:1; pointer-events:all;}
+
+        .modal{
+            background:var(--bg2); border:1px solid var(--border-h); border-radius:20px;
+            width:100%; max-width:560px;
+            transform:translateY(20px); transition:transform 0.3s;
+            overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.7);
+        }
+        .overlay.open .modal{transform:translateY(0);}
+
+        .modal-hdr{
+            display:flex; align-items:center; justify-content:space-between;
+            padding:22px 28px; border-bottom:1px solid var(--border);
+            background:linear-gradient(135deg,rgba(245,158,11,0.05),transparent);
+        }
+        .modal-ttl{font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; font-weight:700; color:var(--t1);}
+
+        .modal-close{
+            width:36px; height:36px; border-radius:50%;
+            border:1px solid rgba(255,255,255,0.1); background:transparent;
+            color:var(--t3); cursor:pointer; font-size:1rem;
+            display:flex; align-items:center; justify-content:center; transition:var(--tr);
+        }
+        .modal-close:hover{background:rgba(255,255,255,0.08); color:var(--t1);}
+
+        .modal-body{padding:28px; display:flex; flex-direction:column; gap:18px;}
+        .modal-foot{
+            padding:18px 28px; border-top:1px solid var(--border);
+            display:flex; gap:10px; justify-content:flex-end;
+            background:rgba(0,0,0,0.3);
+        }
+
+        .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+        .fg{display:flex; flex-direction:column; gap:6px;}
+        .fg.full{grid-column:1/-1;}
+        .flbl{font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--t3);}
+        .finput{
+            padding:10px 14px; background:var(--bg3); border:1px solid rgba(255,255,255,0.08);
+            border-radius:var(--rs); color:var(--t1); font-size:0.875rem;
+            font-family:'Inter',sans-serif; outline:none; transition:var(--tr); width:100%;
+        }
+        .finput::placeholder{color:var(--t4);}
+        .finput:focus{border-color:var(--border-h); background:var(--bg4); box-shadow:0 0 0 3px rgba(245,158,11,0.1);}
+
+        .fselect{cursor:pointer;}
+        .fselect option{background:#1a1a1a;}
+
+        .btn-cancel2{
+            padding:10px 18px; background:transparent;
+            border:1px solid rgba(255,255,255,0.1); border-radius:var(--rs);
+            color:var(--t3); font-family:'Plus Jakarta Sans',sans-serif; font-size:0.875rem;
+            font-weight:600; cursor:pointer; transition:var(--tr);
+        }
+        .btn-cancel2:hover{background:rgba(255,255,255,0.05); color:var(--t1);}
+
+        .btn-save2{
+            padding:10px 22px;
+            background:linear-gradient(135deg, var(--gold-d), var(--gold));
+            border:none; border-radius:var(--rs);
+            color:#fff; font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:0.875rem; font-weight:700; cursor:pointer; transition:var(--tr);
+        }
+        .btn-save2:hover{filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 16px rgba(245,158,11,0.4);}
+
+        /* ── CONFIRM ── */
+        .confirm-ov{
+            position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:800;
+            display:flex; align-items:center; justify-content:center; padding:20px;
+            opacity:0; pointer-events:none; transition:opacity 0.2s;
+        }
+        .confirm-ov.open{opacity:1; pointer-events:all;}
+        .confirm-box{
+            background:var(--bg2); border:1px solid rgba(239,68,68,0.3);
+            border-radius:16px; padding:32px; max-width:400px; width:100%;
+            text-align:center;
+        }
+        .confirm-ico{font-size:3rem; margin-bottom:12px;}
+        .confirm-ttl{font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; font-weight:700; color:var(--t1); margin-bottom:8px;}
+        .confirm-msg{font-size:0.85rem; color:var(--t3); margin-bottom:24px;}
+        .confirm-btns{display:flex; gap:10px; justify-content:center;}
+        .btn-del-ok{
+            padding:10px 22px; background:var(--red); border:none; border-radius:var(--rs);
+            color:#fff; font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:0.875rem; font-weight:700; cursor:pointer; transition:var(--tr);
+        }
+        .btn-del-ok:hover{background:#DC2626;}
+
+        /* ── TOAST ── */
+        .toasts{position:fixed; bottom:24px; right:24px; z-index:900; display:flex; flex-direction:column; gap:8px;}
+        .toast{
+            padding:12px 18px; border-radius:var(--rs); font-size:0.875rem; font-weight:600;
+            color:#fff; display:flex; align-items:center; gap:8px;
+            animation:tin 0.3s ease forwards; box-shadow:0 8px 24px rgba(0,0,0,0.5);
+        }
+        .toast.ok{background:linear-gradient(135deg,#15803d,#22c55e);}
+        .toast.err{background:linear-gradient(135deg,#991b1b,#ef4444);}
+        .toast.inf{background:linear-gradient(135deg,#92400e,var(--gold));}
+        @keyframes tin{from{opacity:0;transform:translateY(10px) scale(0.95)}to{opacity:1;transform:none}}
+
+        /* BADGE BOTÓN NUEVO */
+        .btn-new-user{
+            display:inline-flex; align-items:center; gap:8px;
+            padding:10px 18px; border-radius:var(--rs);
+            background:linear-gradient(135deg, #92400e, var(--gold-d), var(--gold));
+            border:none; color:#fff;
+            font-family:'Plus Jakarta Sans',sans-serif;
+            font-size:0.875rem; font-weight:700; cursor:pointer; transition:var(--tr);
+        }
+        .btn-new-user:hover{filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 18px rgba(245,158,11,0.4);}
+
+        @media(max-width:900px){
+            .table-head,.user-row{grid-template-columns:2fr 1.5fr 1.2fr 100px;}
+            .col-fecha,.col-estado{display:none;}
+        }
+        @media(max-width:600px){
+            .main{padding:20px 12px 60px;}
+            .table-head,.user-row{grid-template-columns:1fr 1fr 90px;}
+            .col-rol,.col-fecha,.col-estado{display:none;}
+        }
+    </style>
+</head>
+<body>
+
+<main class="main">
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-inp" id="search" placeholder="Buscar usuario, email o rol...">
+        </div>
+        <div class="role-filters" id="role-filters"></div>
+        <button class="btn-new-user" id="btn-new">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo usuario
+        </button>
+    </div>
+
+    <!-- Table heading -->
+    <div class="section-row">
+        <h2>Usuarios del sistema</h2>
+        <span class="count-badge" id="count-lbl">0 usuarios</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <div class="table-head">
+            <span>Usuario</span>
+            <span>Email</span>
+            <span class="col-rol">Rol</span>
+            <span class="col-estado">Estado</span>
+            <span class="col-fecha">Creado</span>
+            <span style="text-align:right">Acciones</span>
+        </div>
+        <div id="users-table"></div>
+    </div>
+
+    <!-- Matriz de permisos -->
+    <div class="matrix-section">
+        <div class="matrix-header">
+            <div class="matrix-title">🔐 Matriz de Permisos por Rol</div>
+            <div class="matrix-subtitle">Resumen de lo que puede hacer cada rol en el sistema.</div>
+        </div>
+        <table class="matrix-table" id="matrix-table"></table>
+    </div>
+</main>
+
+<!-- MODAL CREAR / EDITAR -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h2 class="modal-ttl" id="modal-ttl">Nuevo usuario</h2>
+            <button class="modal-close" id="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-id" value="">
+            <div class="form-grid">
+                <div class="fg">
+                    <label class="flbl">Nombre *</label>
+                    <input class="finput" id="f-nombre" placeholder="Laura" autocomplete="off">
+                </div>
+                <div class="fg">
+                    <label class="flbl">Apellido</label>
+                    <input class="finput" id="f-apellido" placeholder="García" autocomplete="off">
+                </div>
+                <div class="fg full">
+                    <label class="flbl">Email *</label>
+                    <input class="finput" id="f-email" type="email" placeholder="usuario@delmisoriano.com" autocomplete="off">
+                </div>
+                <div class="fg">
+                    <label class="flbl" id="pwd-label">Contraseña *</label>
+                    <input class="finput" id="f-pwd" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                </div>
+                <div class="fg">
+                    <label class="flbl">Rol *</label>
+                    <select class="finput fselect" id="f-rol">
+                        <option value="">— Seleccionar rol —</option>
+                    </select>
+                </div>
+                <div class="fg full">
+                    <label class="flbl">Estado</label>
+                    <select class="finput fselect" id="f-activo">
+                        <option value="true">✅ Activo</option>
+                        <option value="false">⛔ Inactivo</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Preview del rol seleccionado -->
+            <div id="rol-preview" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.82rem; color:#E2E8F0; line-height:1.7;"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn-cancel2" id="modal-cancel">Cancelar</button>
+            <button class="btn-save2" id="modal-save">Guardar usuario</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-ov" id="confirm-ov">
+    <div class="confirm-box">
+        <div class="confirm-ico">🗑️</div>
+        <div class="confirm-ttl">¿Eliminar usuario?</div>
+        <div class="confirm-msg" id="confirm-msg">Esta acción no se puede deshacer.</div>
+        <div class="confirm-btns">
+            <button class="btn-cancel2" id="conf-cancel">Cancelar</button>
+            <button class="btn-del-ok" id="conf-ok">Sí, eliminar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="auth.js"></script>
+<script>
+    /* ── AUTH CHECK ─────────────────────────────────── */
+    if (!DS_AUTH.requireAuth('admin_usuarios')) { /* redirige si no tiene permiso */ }
+    DS_AUTH.renderAdminNav('admin-usuarios.html');
+
+    /* ── ESTADO ─────────────────────────────────────── */
+    let users    = [];
+    let filter   = '';
+    let rolFilter = '';
+    let deleteId  = null;
+    const ROLES  = DS_AUTH.ROLES;
+
+    function loadUsers()  { users = DS_AUTH.getUsers(); }
+    function persistUsers() { DS_AUTH.saveUsers(users); }
+
+    /* ── RENDER STATS ───────────────────────────────── */
+    function renderStats() {
+        const activos = users.filter(u => u.activo).length;
+        const html = `
+            <div class="stat"><div class="stat-icon">👥</div><div><div class="stat-num">${users.length}</div><div class="stat-lbl">Total usuarios</div></div></div>
+            <div class="stat"><div class="stat-icon">✅</div><div><div class="stat-num">${activos}</div><div class="stat-lbl">Activos</div></div></div>
+            <div class="stat"><div class="stat-icon">⛔</div><div><div class="stat-num">${users.length - activos}</div><div class="stat-lbl">Inactivos</div></div></div>
+            ${Object.entries(ROLES).map(([r,info]) =>
+                `<div class="stat"><div class="stat-icon">${info.emoji}</div><div>
+                    <div class="stat-num" style="color:${info.color}">${users.filter(u=>u.rol===r).length}</div>
+                    <div class="stat-lbl">${info.label}</div>
+                </div></div>`
+            ).join('')}
+        `;
+        document.getElementById('stats-row').innerHTML = html;
+    }
+
+    /* ── ROLE FILTER PILLS ──────────────────────────── */
+    function renderRoleFilters() {
+        const div = document.getElementById('role-filters');
+        div.innerHTML = `<button class="role-pill ${rolFilter===''?'active':''}"
+            style="${rolFilter===''?'color:var(--gold);border-color:rgba(245,158,11,0.35);background:rgba(245,158,11,0.1)':''}"
+            data-rol="">Todos</button>
+        ` + Object.entries(ROLES).map(([r, info]) => `
+            <button class="role-pill ${rolFilter===r?'active':''}"
+                style="${rolFilter===r ? `color:${info.color};border-color:${info.border};background:${info.bg}` : ''}"
+                data-rol="${r}">${info.emoji} ${info.label}</button>
+        `).join('');
+
+        div.querySelectorAll('.role-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                rolFilter = btn.dataset.rol;
+                renderRoleFilters();
+                renderTable();
+            });
+        });
+    }
+
+    /* ── RENDER TABLE ───────────────────────────────── */
+    function renderTable() {
+        const term = filter.toLowerCase();
+        const me   = DS_AUTH.getSession();
+
+        const lista = users.filter(u => {
+            const matchTerm = !term ||
+                (u.nombre + ' ' + u.apellido).toLowerCase().includes(term) ||
+                u.email.toLowerCase().includes(term) ||
+                u.rol.toLowerCase().includes(term);
+            const matchRol  = !rolFilter || u.rol === rolFilter;
+            return matchTerm && matchRol;
+        });
+
+        document.getElementById('count-lbl').textContent = `${lista.length} usuario${lista.length!==1?'s':''}`;
+        const tbody = document.getElementById('users-table');
+
+        if (!lista.length) {
+            tbody.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div><p>Sin resultados</p></div>`;
+            return;
+        }
+
+        const isSelf = (u) => me && me.userId === u.id;
+
+        tbody.innerHTML = lista.map(u => {
+            const role = ROLES[u.rol] || {};
+            const initials = (u.nombre[0] + (u.apellido?.[0]||'')).toUpperCase();
+            const realIdx  = users.indexOf(u);
+            return `
+            <div class="user-row ${u.activo ? '' : 'inactive'}" id="ur-${u.id}">
+                <div class="user-info">
+                    <div class="user-avatar" style="background:${role.bg};border:1px solid ${role.border};color:${role.color}">${initials}</div>
+                    <div>
+                        <div class="user-name">${u.nombre} ${u.apellido} ${isSelf(u) ? '<span style="font-size:0.65rem;color:var(--gold);font-weight:700;padding:1px 6px;background:rgba(245,158,11,0.1);border-radius:4px;border:1px solid rgba(245,158,11,0.2);">Tú</span>' : ''}</div>
+                        <div class="user-email">${u.email}</div>
+                    </div>
+                </div>
+                <div>${u.email}</div>
+                <div class="col-rol">
+                    <span class="role-tag" style="background:${role.bg};border:1px solid ${role.border};color:${role.color}">
+                        ${role.emoji} ${role.label}
+                    </span>
+                </div>
+                <div class="col-estado">
+                    <div class="active-${u.activo}">
+                        <span class="status-dot"></span>
+                        <span class="status-text">${u.activo ? 'Activo' : 'Inactivo'}</span>
+                    </div>
+                </div>
+                <div class="date-cell col-fecha">${u.creado||'—'}</div>
+                <div class="actions-cell">
+                    <button class="btn-icon btn-edit-user" title="Editar" onclick="openEdit('${u.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-icon btn-toggle ${u.activo ? 'is-active' : ''}" title="${u.activo?'Desactivar':'Activar'}" onclick="toggleActive('${u.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${u.activo ? '<path d="M18.36 6.64A9 9 0 0 1 20.77 14"/><path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="2" y1="2" x2="22" y2="22"/>' : '<path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/><polyline points="10 8 16 12 10 16 10 8"/>'}</svg>
+                    </button>
+                    ${!isSelf(u) ? `
+                    <button class="btn-icon btn-del" title="Eliminar" onclick="confirmDel('${u.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6m4-6v6"/></svg>
+                    </button>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── RENDER MATRIX ──────────────────────────────── */
+    function renderMatrix() {
+        const perms = [
+            { key:'admin_usuarios',   label:'👤 Gestionar usuarios' },
+            { key:'admin_productos',  label:'📦 Gestionar productos' },
+            { key:'ver_pedidos',      label:'📋 Ver pedidos' },
+            { key:'ver_contabilidad', label:'📊 Ver contabilidad' },
+            { key:'hacer_pedidos',    label:'🛒 Realizar pedidos' },
+            { key:'ver_catalogo',     label:'🌐 Ver catálogo web' },
+        ];
+        const roles = Object.entries(ROLES);
+
+        const thead = `<thead><tr>
+            <th style="min-width:200px">Permiso</th>
+            ${roles.map(([r,info]) => `
+                <th style="color:${info.color};min-width:110px">
+                    ${info.emoji}<br>${info.label}
+                </th>`).join('')}
+        </tr></thead>`;
+
+        const rows = perms.map(p => `<tr>
+            <td>${p.label}</td>
+            ${roles.map(([r, info]) =>
+                info.permisos.includes(p.key)
+                    ? `<td><span class="perm-yes" style="color:${info.color}">✦</span></td>`
+                    : `<td><span class="perm-no">—</span></td>`
+            ).join('')}
+        </tr>`).join('');
+
+        document.getElementById('matrix-table').innerHTML = thead + `<tbody>${rows}</tbody>`;
+    }
+
+    /* ── MODAL ──────────────────────────────────────── */
+    function openModal(title) {
+        document.getElementById('modal-ttl').textContent = title;
+        // Poblar select de roles
+        const sel = document.getElementById('f-rol');
+        sel.innerHTML = '<option value="">— Seleccionar rol —</option>' +
+            Object.entries(ROLES).map(([r,info]) =>
+                `<option value="${r}">${info.emoji} ${info.label}</option>`).join('');
+        document.getElementById('overlay').classList.add('open');
+        sel.addEventListener('change', updateRolPreview);
+    }
+
+    function updateRolPreview() {
+        const r = document.getElementById('f-rol').value;
+        const div = document.getElementById('rol-preview');
+        if (!r) { div.style.display='none'; return; }
+        const role = ROLES[r];
+        div.style.display = 'block';
+        div.style.background = role.bg;
+        div.style.border = `1px solid ${role.border}`;
+        div.innerHTML = `<strong style="color:${role.color}">${role.emoji} ${role.label}</strong> — Puede: <em style="color:var(--t3)">${role.permisos.join(', ')}</em>`;
+    }
+
+    function closeModal() {
+        document.getElementById('overlay').classList.remove('open');
+        resetForm();
+    }
+
+    function resetForm() {
+        ['f-nombre','f-apellido','f-email','f-pwd'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('f-rol').value = '';
+        document.getElementById('f-activo').value = 'true';
+        document.getElementById('edit-id').value = '';
+        document.getElementById('pwd-label').textContent = 'Contraseña *';
+        document.getElementById('rol-preview').style.display = 'none';
+    }
+
+    function openEdit(id) {
+        const u = users.find(u => u.id === id);
+        if (!u) return;
+        document.getElementById('edit-id').value   = id;
+        document.getElementById('f-nombre').value  = u.nombre;
+        document.getElementById('f-apellido').value= u.apellido;
+        document.getElementById('f-email').value   = u.email;
+        document.getElementById('f-pwd').value     = '';
+        document.getElementById('f-activo').value  = String(u.activo);
+        openModal(`Editar: ${u.nombre} ${u.apellido}`);
+        document.getElementById('f-rol').value = u.rol;
+        document.getElementById('pwd-label').textContent = 'Nueva contraseña (dejar vacío para no cambiar)';
+        updateRolPreview();
+    }
+
+    function saveUser() {
+        const id      = document.getElementById('edit-id').value;
+        const nombre  = document.getElementById('f-nombre').value.trim();
+        const apellido= document.getElementById('f-apellido').value.trim();
+        const email   = document.getElementById('f-email').value.trim().toLowerCase();
+        const pwd     = document.getElementById('f-pwd').value;
+        const rol     = document.getElementById('f-rol').value;
+        const activo  = document.getElementById('f-activo').value === 'true';
+
+        if (!nombre || !email || !rol) { toast('Completa los campos obligatorios (*)', 'err'); return; }
+        if (!id && !pwd) { toast('La contraseña es obligatoria para usuarios nuevos', 'err'); return; }
+        if (pwd && pwd.length < 6) { toast('La contraseña debe tener al menos 6 caracteres', 'err'); return; }
+
+        // Check email duplicado
+        const duplic = users.find(u => u.email === email && u.id !== id);
+        if (duplic) { toast('Ya existe un usuario con ese email', 'err'); return; }
+
+        if (id) {
+            // Editar
+            const u = users.find(u => u.id === id);
+            u.nombre   = nombre;
+            u.apellido = apellido;
+            u.email    = email;
+            u.rol      = rol;
+            u.activo   = activo;
+            if (pwd) u.password = DS_AUTH.hashPwd(pwd);
+            toast(`✏️ Usuario "${nombre}" actualizado`, 'inf');
+        } else {
+            // Crear
+            const newUser = {
+                id:       'u' + Date.now(),
+                nombre, apellido, email,
+                password: DS_AUTH.hashPwd(pwd),
+                rol, activo,
+                creado:   new Date().toISOString().split('T')[0]
+            };
+            users.push(newUser);
+            toast(`✅ Usuario "${nombre}" creado`, 'ok');
+        }
+
+        persistUsers();
+        closeModal();
+        renderAll();
+    }
+
+    /* ── TOGGLE ACTIVE ──────────────────────────────── */
+    function toggleActive(id) {
+        const u = users.find(u => u.id === id);
+        if (!u) return;
+        const me = DS_AUTH.getSession();
+        if (me && me.userId === id) { toast('No puedes desactivar tu propia cuenta', 'err'); return; }
+        u.activo = !u.activo;
+        persistUsers();
+        renderAll();
+        toast(`${u.activo ? '✅ Activado' : '⛔ Desactivado'}: ${u.nombre}`, 'inf');
+    }
+
+    /* ── DELETE ─────────────────────────────────────── */
+    function confirmDel(id) {
+        deleteId = id;
+        const u = users.find(u => u.id === id);
+        document.getElementById('confirm-msg').textContent =
+            `¿Eliminar al usuario "${u?.nombre} ${u?.apellido}"? Esta acción no se puede deshacer.`;
+        document.getElementById('confirm-ov').classList.add('open');
+    }
+
+    function doDelete() {
+        if (!deleteId) return;
+        const u = users.find(u => u.id === deleteId);
+        users = users.filter(u => u.id !== deleteId);
+        persistUsers();
+        deleteId = null;
+        document.getElementById('confirm-ov').classList.remove('open');
+        renderAll();
+        toast(`🗑️ "${u?.nombre}" eliminado`, 'err');
+    }
+
+    /* ── TOAST ──────────────────────────────────────── */
+    function toast(msg, type='inf', ms=3200) {
+        const c = document.getElementById('toasts');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.textContent = msg;
+        c.appendChild(el);
+        setTimeout(() => el.remove(), ms);
+    }
+
+    /* ── RENDER ALL ─────────────────────────────────── */
+    function renderAll() {
+        renderStats();
+        renderRoleFilters();
+        renderTable();
+        renderMatrix();
+    }
+
+    /* ── EVENTOS ────────────────────────────────────── */
+    document.getElementById('btn-new').addEventListener('click', () => {
+        resetForm();
+        openModal('Nuevo usuario');
+    });
+
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-save').addEventListener('click', saveUser);
+
+    document.getElementById('overlay').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+
+    document.getElementById('search').addEventListener('input', e => {
+        filter = e.target.value;
+        renderTable();
+    });
+
+    document.getElementById('conf-cancel').addEventListener('click', () => {
+        document.getElementById('confirm-ov').classList.remove('open');
+        deleteId = null;
+    });
+    document.getElementById('conf-ok').addEventListener('click', doDelete);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeModal();
+            document.getElementById('confirm-ov').classList.remove('open');
+        }
+    });
+
+    /* ── INICIO ─────────────────────────────────────── */
+    loadUsers();
+    renderAll();
+</script>
+</body>
+</html>

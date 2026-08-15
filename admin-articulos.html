@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Artículos — Delmi Soriano</title>
+    <script src="auth.js"></script>
+    <script src="db.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --g: #F59E0B;
+            --gd: #D97706;
+            --bg: #000;
+            --bg2: #0a0a0a;
+            --bg3: #111;
+            --bg4: #1c1c1c;
+            --bo: rgba(245, 158, 11, .12);
+            --boh: rgba(245, 158, 11, .35);
+            --t1: #fff;
+            --t2: #E2E8F0;
+            --t3: #94A3B8;
+            --t4: #475569;
+            --red: #EF4444;
+            --green: #22C55E;
+            --blue: #38BDF8;
+            --r: 12px;
+            --rs: 8px;
+            --tr: .2s ease
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--t2);
+            min-height: 100vh
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, rgba(245, 158, 11, .06), transparent 60%);
+            border-bottom: 1px solid var(--bo);
+            padding: 28px 32px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .7rem;
+            color: var(--t4);
+            margin-bottom: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em
+        }
+
+        .breadcrumb a {
+            color: var(--t4);
+            text-decoration: none;
+            transition: var(--tr)
+        }
+
+        .breadcrumb a:hover {
+            color: var(--g)
+        }
+
+        .page-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--t1);
+            letter-spacing: -.02em
+        }
+
+        .page-sub {
+            font-size: .8rem;
+            color: var(--t3);
+            margin-top: 4px
+        }
+
+        .btn-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            background: linear-gradient(135deg, #92400e, var(--gd), var(--g));
+            border: none;
+            border-radius: var(--rs);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--tr)
+        }
+
+        .btn-new:hover {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, .4)
+        }
+
+        .main {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 28px 24px 80px
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: var(--bg3);
+            border: 1px solid var(--bo);
+            border-radius: var(--r);
+            flex: 1;
+            min-width: 120px
+        }
+
+        .stat-ico {
+            font-size: 1.4rem
+        }
+
+        .stat-v {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--g);
+            line-height: 1
+        }
+
+        .stat-l {
+            font-size: .65rem;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-top: 2px
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .srch {
+            position: relative;
+            flex: 1;
+            min-width: 220px
+        }
+
+        .srch svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--t4);
+            pointer-events: none
+        }
+
+        .srch input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: var(--bg3);
+            border: 1px solid var(--bo);
+            border-radius: var(--rs);
+            color: var(--t1);
+            font-size: .875rem;
+            outline: none;
+            transition: var(--tr);
+            font-family: 'Inter', sans-serif
+        }
+
+        .srch input::placeholder {
+            color: var(--t4)
+        }
+
+        .srch input:focus {
+            border-color: var(--boh);
+            background: var(--bg4)
+        }
+
+        .fsel {
+            padding: 10px 12px;
+            background: var(--bg3);
+            border: 1px solid var(--bo);
+            border-radius: var(--rs);
+            color: var(--t2);
+            font-size: .82rem;
+            outline: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif
+        }
+
+        .fsel option {
+            background: #111
+        }
+
+        .cat-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 18px
+        }
+
+        .cat-pill {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: var(--t3);
+            background: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: var(--tr)
+        }
+
+        .cat-pill:hover {
+            border-color: rgba(245, 158, 11, .25);
+            color: var(--t2)
+        }
+
+        .cat-pill.active {
+            background: rgba(245, 158, 11, .12);
+            border-color: rgba(245, 158, 11, .3);
+            color: var(--g)
+        }
+
+        .section-h {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .section-h h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--t1)
+        }
+
+        .count-badge {
+            font-size: .7rem;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .2);
+            color: var(--g);
+            font-weight: 600
+        }
+
+        .tbl-wrap {
+            background: var(--bg3);
+            border: 1px solid var(--bo);
+            border-radius: var(--r);
+            overflow: hidden
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .tbl th {
+            padding: 11px 14px;
+            font-size: .63rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--t4);
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            text-align: left;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: var(--tr)
+        }
+
+        .tbl th:hover {
+            color: var(--t2)
+        }
+
+        .tbl th:last-child {
+            cursor: default
+        }
+
+        .sort-asc::after {
+            content: ' ▲';
+            font-size: .58rem;
+            color: var(--g)
+        }
+
+        .sort-desc::after {
+            content: ' ▼';
+            font-size: .58rem;
+            color: var(--g)
+        }
+
+        .tbl td {
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, .03);
+            font-size: .82rem;
+            vertical-align: middle
+        }
+
+        .tbl tr:last-child td {
+            border-bottom: none
+        }
+
+        .tbl tr:hover td {
+            background: rgba(255, 255, 255, .015)
+        }
+
+        .tbl td.right {
+            text-align: right
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: .63rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            border: 1px solid
+        }
+
+        .chip.g {
+            background: rgba(34, 197, 94, .1);
+            border-color: rgba(34, 197, 94, .25);
+            color: var(--green)
+        }
+
+        .chip.r {
+            background: rgba(239, 68, 68, .08);
+            border-color: rgba(239, 68, 68, .2);
+            color: var(--red)
+        }
+
+        .chip.b {
+            background: rgba(56, 189, 248, .1);
+            border-color: rgba(56, 189, 248, .25);
+            color: var(--blue)
+        }
+
+        .stock-low {
+            color: var(--red);
+            font-weight: 700
+        }
+
+        .stock-mid {
+            color: var(--g);
+            font-weight: 700
+        }
+
+        .stock-ok {
+            color: var(--green);
+            font-weight: 700
+        }
+
+        .ia {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end
+        }
+
+        .bic {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--rs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid;
+            background: transparent;
+            transition: var(--tr);
+            font-size: .82rem
+        }
+
+        .bic.e {
+            border-color: rgba(245, 158, 11, .2);
+            color: var(--g)
+        }
+
+        .bic.e:hover {
+            background: rgba(245, 158, 11, .1)
+        }
+
+        .bic.d {
+            border-color: rgba(239, 68, 68, .2);
+            color: var(--red)
+        }
+
+        .bic.d:hover {
+            background: rgba(239, 68, 68, .1)
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 56px;
+            color: var(--t4);
+            font-family: 'Plus Jakarta Sans', sans-serif
+        }
+
+        .ov {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .88);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 36px 12px;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s
+        }
+
+        .ov.open {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--boh);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 620px;
+            transform: translateY(20px);
+            transition: transform .3s;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, .7)
+        }
+
+        .ov.open .modal {
+            transform: translateY(0)
+        }
+
+        .mhdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--bo);
+            background: linear-gradient(135deg, rgba(245, 158, 11, .05), transparent)
+        }
+
+        .mttl {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--t1)
+        }
+
+        .mclose {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, .1);
+            background: transparent;
+            color: var(--t3);
+            cursor: pointer;
+            font-size: .95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--tr)
+        }
+
+        .mclose:hover {
+            background: rgba(255, 255, 255, .08);
+            color: var(--t1)
+        }
+
+        .mbody {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .mfoot {
+            padding: 14px 24px;
+            border-top: 1px solid var(--bo);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            background: rgba(0, 0, 0, .3)
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .fg2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .fg3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px
+        }
+
+        .flbl {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: .07em
+        }
+
+        .fi {
+            padding: 9px 11px;
+            background: var(--bg4);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: var(--rs);
+            color: var(--t1);
+            font-size: .875rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: var(--tr);
+            width: 100%
+        }
+
+        .fi::placeholder {
+            color: var(--t4)
+        }
+
+        .fi:focus {
+            border-color: var(--boh);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, .08)
+        }
+
+        textarea.fi {
+            resize: vertical;
+            min-height: 68px
+        }
+
+        select.fi {
+            cursor: pointer
+        }
+
+        .fi-num {
+            text-align: right
+        }
+
+        .btn-save {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--gd), var(--g));
+            border: none;
+            border-radius: var(--rs);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--tr)
+        }
+
+        .btn-save:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px)
+        }
+
+        .btn-cn {
+            padding: 10px 14px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: var(--rs);
+            color: var(--t3);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--tr)
+        }
+
+        .btn-cn:hover {
+            background: rgba(255, 255, 255, .05)
+        }
+
+        .cov {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .9);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s
+        }
+
+        .cov.open {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .cbox {
+            background: var(--bg2);
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            transform: scale(.9);
+            transition: transform .2s
+        }
+
+        .cov.open .cbox {
+            transform: scale(1)
+        }
+
+        .cico {
+            font-size: 2.4rem;
+            margin-bottom: 8px
+        }
+
+        .cttl {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--t1);
+            margin-bottom: 6px
+        }
+
+        .cmsg {
+            font-size: .8rem;
+            color: var(--t3);
+            margin-bottom: 20px
+        }
+
+        .cbtns {
+            display: flex;
+            gap: 10px;
+            justify-content: center
+        }
+
+        .btn-del {
+            padding: 9px 18px;
+            background: var(--red);
+            border: none;
+            border-radius: var(--rs);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: .875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--tr)
+        }
+
+        .btn-del:hover {
+            background: #dc2626
+        }
+
+        .tco {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .tst {
+            padding: 11px 18px;
+            border-radius: var(--rs);
+            font-size: .875rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            animation: tin .3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5)
+        }
+
+        .tst.ok {
+            background: linear-gradient(135deg, #15803d, #22c55e)
+        }
+
+        .tst.err {
+            background: linear-gradient(135deg, #991b1b, #ef4444)
+        }
+
+        .tst.inf {
+            background: linear-gradient(135deg, #92400e, var(--g))
+        }
+
+        @keyframes tin {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(.95)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        @media(max-width:640px) {
+
+            .fg2,
+            .fg3 {
+                grid-template-columns: 1fr
+            }
+
+            .page-header {
+                padding: 20px 16px
+            }
+
+            .main {
+                padding: 16px 12px 60px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <div>
+            <div class="breadcrumb">
+                <a href="index.html">🌐 Web</a><span style="opacity:.4">›</span>
+                <span>📦 Productos</span><span style="opacity:.4">›</span>
+                <span style="color:var(--g)">🗂️ Artículos</span>
+            </div>
+            <div class="page-title">🗂️ Artículos</div>
+            <div class="page-sub">Gestión del catálogo de artículos y stock</div>
+        </div>
+        <button class="btn-new" onclick="openArticulo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Nuevo artículo
+        </button>
+    </div>
+    <main class="main">
+        <div class="stats" id="stats"></div>
+        <div class="toolbar">
+            <div class="srch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input id="sc" placeholder="Buscar artículo...">
+            </div>
+            <select class="fsel" id="fa">
+                <option value="">Todos los estados</option>
+                <option value="true">✅ Activos</option>
+                <option value="false">⛔ Inactivos</option>
+            </select>
+        </div>
+        <div class="cat-pills" id="cat-pills"></div>
+        <div class="section-h">
+            <h2>Lista de artículos</h2>
+            <span class="count-badge" id="count-lbl">0 artículos</span>
+        </div>
+        <div class="tbl-wrap">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th id="th-nombre" onclick="sortBy('nombre')">Artículo</th>
+                        <th id="th-categoria" onclick="sortBy('categoria')">Categoría</th>
+                        <th id="th-precio" onclick="sortBy('precio')" style="text-align:right">Precio</th>
+                        <th>IVA</th>
+                        <th>Unidad</th>
+                        <th id="th-stock" onclick="sortBy('stock')" style="text-align:right">Stock</th>
+                        <th>Estado</th>
+                        <th style="text-align:right;cursor:default">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="ov" id="ov">
+        <div class="modal">
+            <div class="mhdr"><span class="mttl" id="mttl">Nuevo artículo</span><button class="mclose"
+                    onclick="closeModal()">✕</button></div>
+            <div class="mbody">
+                <input type="hidden" id="art-id">
+                <div class="fg"><label class="flbl">Nombre *</label><input class="fi" id="art-nombre"
+                        placeholder="Pan de Masa Madre 500g"></div>
+                <div class="fg"><label class="flbl">Descripción</label><textarea class="fi" id="art-desc"
+                        placeholder="Descripción breve..."></textarea></div>
+                <div class="fg2">
+                    <div class="fg"><label class="flbl">Categoría *</label><select class="fi" id="art-cat"></select>
+                    </div>
+                    <div class="fg"><label class="flbl">Unidad *</label>
+                        <select class="fi" id="art-uni">
+                            <option value="unidad">Unidad</option>
+                            <option value="kg">Kg</option>
+                            <option value="caja">Caja</option>
+                            <option value="docena">Docena</option>
+                            <option value="litro">Litro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fg3">
+                    <div class="fg"><label class="flbl">Precio (€) *</label><input class="fi fi-num" id="art-precio"
+                            type="number" min="0" step="0.01" placeholder="0.00"></div>
+                    <div class="fg"><label class="flbl">IVA (%)</label><input class="fi fi-num" id="art-iva"
+                            type="number" min="0" max="21" step="1" value="10"></div>
+                    <div class="fg"><label class="flbl">Stock</label><input class="fi fi-num" id="art-stock"
+                            type="number" min="0" step="1" placeholder="0"></div>
+                </div>
+                <div class="fg"><label class="flbl">Estado</label>
+                    <select class="fi" id="art-activo">
+                        <option value="true">✅ Activo</option>
+                        <option value="false">⛔ Inactivo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mfoot"><button class="btn-cn" onclick="closeModal()">Cancelar</button><button class="btn-save"
+                    onclick="saveArticulo()">Guardar artículo</button></div>
+        </div>
+    </div>
+
+    <!-- CONFIRM -->
+    <div class="cov" id="conf-ov">
+        <div class="cbox">
+            <div class="cico">🗑️</div>
+            <div class="cttl">¿Eliminar artículo?</div>
+            <div class="cmsg" id="conf-msg"></div>
+            <div class="cbtns"><button class="btn-cn" onclick="closeConfirm()">Cancelar</button><button class="btn-del"
+                    id="conf-btn">Sí, eliminar</button></div>
+        </div>
+    </div>
+    <div class="tco" id="tco"></div>
+
+    <script>
+        if (!DS_AUTH.requireAuth('admin_productos')) { }
+        DS_AUTH.renderAdminNav('admin-articulos.html');
+        const DB = DS_DB;
+        let articulos = [], sortField = 'nombre', sortDir = 1, filterCat = '';
+        function load() { articulos = DB.getArticulos(); }
+        function renderStats() {
+            const act = articulos.filter(a => a.activo).length;
+            const bajo = articulos.filter(a => (a.stock || 0) <= 5).length;
+            const val = articulos.reduce((s, a) => s + (a.precio * (a.stock || 0)), 0);
+            document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-ico">🗂️</div><div><div class="stat-v">${articulos.length}</div><div class="stat-l">Total</div></div></div>
+    <div class="stat"><div class="stat-ico">✅</div><div><div class="stat-v">${act}</div><div class="stat-l">Activos</div></div></div>
+    <div class="stat"><div class="stat-ico">⚠️</div><div><div class="stat-v" style="color:var(--red)">${bajo}</div><div class="stat-l">Stock bajo</div></div></div>
+    <div class="stat"><div class="stat-ico">💶</div><div><div class="stat-v">${DB.formatMoney(val)}</div><div class="stat-l">Valor stock</div></div></div>
+    ${DB.CATEGORIAS.map(c => `<div class="stat"><div class="stat-ico">${c.emoji}</div><div><div class="stat-v" style="font-size:1.1rem">${articulos.filter(a => a.categoria === c.key).length}</div><div class="stat-l">${c.label}</div></div></div>`).join('')}`;
+        }
+        function renderCatPills() {
+            const pills = `<button class="cat-pill ${filterCat === '' ? 'active' : ''}" onclick="setCat('')">🔹 Todos</button>` +
+                DB.CATEGORIAS.map(c => `<button class="cat-pill ${filterCat === c.key ? 'active' : ''}" onclick="setCat('${c.key}')">${c.emoji} ${c.label}</button>`).join('');
+            document.getElementById('cat-pills').innerHTML = pills;
+        }
+        function setCat(k) { filterCat = k; render(); }
+        let sortMap = { nombre: 0, categoria: 0, precio: 0, stock: 0 };
+        function sortBy(f) {
+            if (sortField === f) sortDir *= -1; else { sortField = f; sortDir = 1; }
+            render();
+        }
+        function render() {
+            renderStats(); renderCatPills();
+            const term = (document.getElementById('sc').value || '').toLowerCase();
+            const fa = document.getElementById('fa').value;
+            let list = articulos.filter(a => {
+                const m = !term || (a.nombre + ' ' + (a.descripcion || '')).toLowerCase().includes(term);
+                const c = !filterCat || a.categoria === filterCat;
+                const ac = !fa || (fa === 'true' ? a.activo : !a.activo);
+                return m && c && ac;
+            });
+            list = list.slice().sort((a, b) => {
+                let va = a[sortField], vb = b[sortField];
+                if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+                return typeof va === 'number' ? sortDir * (va - vb) : sortDir * (va < vb ? -1 : va > vb ? 1 : 0);
+            });
+            // Update sort headers
+            ['nombre', 'categoria', 'precio', 'stock'].forEach(f => {
+                const th = document.getElementById('th-' + f);
+                if (th) { th.classList.remove('sort-asc', 'sort-desc'); if (sortField === f) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc'); }
+            });
+            document.getElementById('count-lbl').textContent = `${list.length} artículo${list.length !== 1 ? 's' : ''}`;
+            const tb = document.getElementById('tbody');
+            if (!list.length) { tb.innerHTML = `<tr class="empty-row"><td colspan="8">🔍 No se encontraron artículos</td></tr>`; return; }
+            tb.innerHTML = list.map(a => {
+                const cat = DB.CATEGORIAS.find(c => c.key === a.categoria) || { label: a.categoria, emoji: '📦' };
+                const s = a.stock || 0; const sc = s === 0 ? 'stock-low' : s <= 5 ? 'stock-mid' : 'stock-ok';
+                return `<tr>
+      <td><div style="font-weight:700;color:var(--t1)">${a.nombre}</div><div style="font-size:.7rem;color:var(--t4);margin-top:2px">${a.descripcion || ''}</div></td>
+      <td><span class="chip b">${cat.emoji} ${cat.label}</span></td>
+      <td style="font-weight:700;color:var(--g);text-align:right">${DB.formatMoney(a.precio)}</td>
+      <td style="color:var(--t3)">${a.iva || 0}%</td>
+      <td style="color:var(--t3)">${a.unidad || 'ud.'}</td>
+      <td class="right"><span class="${sc}">${s}</span></td>
+      <td><span class="chip ${a.activo ? 'g' : 'r'}">${a.activo ? 'Activo' : 'Inact.'}</span></td>
+      <td class="right"><div class="ia">
+        <button class="bic e" onclick="openArticulo('${a.id}')" title="Editar">✏️</button>
+        <button class="bic d" onclick="askDelete('${a.id}','${a.nombre.replace(/'/g, "\\'")}')">🗑</button>
+      </div></td>
+    </tr>`;
+            }).join('');
+        }
+        function openArticulo(id) {
+            const a = id ? articulos.find(x => x.id === id) : null;
+            document.getElementById('mttl').textContent = a ? '✏️ Editar artículo' : '🗂️ Nuevo artículo';
+            document.getElementById('art-id').value = a?.id || '';
+            document.getElementById('art-nombre').value = a?.nombre || '';
+            document.getElementById('art-desc').value = a?.descripcion || '';
+            document.getElementById('art-precio').value = a?.precio || '';
+            document.getElementById('art-iva').value = a?.iva ?? 10;
+            document.getElementById('art-stock').value = a?.stock ?? 0;
+            document.getElementById('art-uni').value = a?.unidad || 'unidad';
+            document.getElementById('art-activo').value = String(a?.activo !== false);
+            const catSel = document.getElementById('art-cat');
+            catSel.innerHTML = DB.CATEGORIAS.map(c => `<option value="${c.key}" ${a?.categoria === c.key ? 'selected' : ''}>${c.emoji} ${c.label}</option>`).join('');
+            document.getElementById('ov').classList.add('open');
+        }
+        function closeModal() { document.getElementById('ov').classList.remove('open'); }
+        function saveArticulo() {
+            const nombre = document.getElementById('art-nombre').value.trim();
+            const precio = parseFloat(document.getElementById('art-precio').value) || 0;
+            if (!nombre) { toast('El nombre es obligatorio', 'err'); return; }
+            if (!precio) { toast('El precio debe ser mayor que 0', 'err'); return; }
+            const id = document.getElementById('art-id').value;
+            const data = { nombre, descripcion: document.getElementById('art-desc').value.trim(), categoria: document.getElementById('art-cat').value, precio, iva: parseInt(document.getElementById('art-iva').value) || 0, stock: parseInt(document.getElementById('art-stock').value) || 0, unidad: document.getElementById('art-uni').value, activo: document.getElementById('art-activo').value === 'true' };
+            if (id) DB.updateArticulo(id, data); else DB.addArticulo(data);
+            load(); closeModal(); render();
+            toast(id ? 'Artículo actualizado ✓' : 'Artículo creado ✓', 'ok');
+        }
+        function askDelete(id, name) {
+            document.getElementById('conf-msg').textContent = `¿Eliminar "${name}"? Esta acción no se puede deshacer.`;
+            document.getElementById('conf-btn').onclick = () => { closeConfirm(); DB.deleteArticulo(id); load(); render(); toast('Artículo eliminado', 'err'); };
+            document.getElementById('conf-ov').classList.add('open');
+        }
+        function closeConfirm() { document.getElementById('conf-ov').classList.remove('open'); }
+        function toast(msg, type = 'inf', ms = 3000) { const c = document.getElementById('tco'); const el = document.createElement('div'); el.className = `tst ${type}`; el.textContent = msg; c.appendChild(el); setTimeout(() => el.remove(), ms); }
+        document.getElementById('sc').addEventListener('input', render);
+        document.getElementById('fa').addEventListener('change', render);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
+        load(); render();
+    </script>
+</body>
+
+</html>

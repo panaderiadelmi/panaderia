@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos — Delmi Soriano</title>
+    <script src="auth.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── RESET & BASE ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:   #F59E0B;
+            --primary-d: #D97706;
+            --primary-l: #FCD34D;
+            --primary-rgb: 245,158,11;
+            --bg:        #000000;
+            --bg2:       #0d0d0d;
+            --bg3:       #141414;
+            --bg4:       #1c1c1c;
+            --border:    rgba(245,158,11,0.15);
+            --border-h:  rgba(245,158,11,0.4);
+            --text1:     #FFFFFF;
+            --text2:     #E2E8F0;
+            --text3:     #94A3B8;
+            --text4:     #475569;
+            --red:       #EF4444;
+            --green:     #22C55E;
+            --radius:    12px;
+            --radius-sm: 8px;
+            --transition: 0.2s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text2);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text3);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: var(--transition);
+        }
+        .back-link:hover { color: var(--text1); border-color: rgba(255,255,255,0.2); }
+
+        .topbar-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text1);
+        }
+
+        .topbar-title span { color: var(--primary); }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #92400e, var(--primary-d), var(--primary));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.02em;
+        }
+        .btn-add:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(var(--primary-rgb),0.4); }
+
+        /* ── MAIN LAYOUT ── */
+        .main { max-width: 1280px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .stat-chip-icon { font-size: 1.4rem; }
+        .stat-chip-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-chip-label { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* ── SEARCH + FILTER ── */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text4);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text1);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-input::placeholder { color: var(--text4); }
+        .search-input:focus { border-color: var(--border-h); background: var(--bg4); }
+
+        /* ── PRODUCT GRID ── */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover { border-color: var(--border-h); box-shadow: 0 8px 32px rgba(var(--primary-rgb),0.1); }
+
+        .product-card-img {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+            background: var(--bg4);
+        }
+
+        .product-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .product-card:hover .product-card-img img { transform: scale(1.05); }
+
+        .product-card-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 12px;
+        }
+
+        .product-icon-badge {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .product-card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .product-card-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text1);
+        }
+
+        .product-card-desc {
+            font-size: 0.8rem;
+            color: var(--text3);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-ingredients-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .ingredient-pill {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(var(--primary-rgb), 0.08);
+            border: 1px solid rgba(var(--primary-rgb), 0.2);
+            color: rgba(245,158,11,0.8);
+        }
+
+        .ingredient-pill-more {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+            color: var(--text4);
+        }
+
+        .product-card-footer {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-edit, .btn-delete, .btn-duplicate {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .btn-edit {
+            background: rgba(var(--primary-rgb), 0.08);
+            border-color: rgba(var(--primary-rgb), 0.25);
+            color: var(--primary);
+            flex: 1;
+        }
+        .btn-edit:hover { background: rgba(var(--primary-rgb), 0.2); border-color: var(--primary); }
+
+        .btn-duplicate {
+            background: rgba(148,163,184,0.06);
+            border-color: rgba(148,163,184,0.15);
+            color: var(--text3);
+        }
+        .btn-duplicate:hover { background: rgba(148,163,184,0.12); color: var(--text1); }
+
+        .btn-delete {
+            background: rgba(239,68,68,0.06);
+            border-color: rgba(239,68,68,0.2);
+            color: #EF4444;
+        }
+        .btn-delete:hover { background: rgba(239,68,68,0.15); border-color: #EF4444; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text4);
+        }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 16px; }
+        .empty-state h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.2rem; color: var(--text3); margin-bottom: 8px; }
+        .empty-state p { font-size: 0.875rem; }
+
+        /* ── MODAL OVERLAY ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 16px;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border-h);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(var(--primary-rgb),0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb),0.06), transparent);
+        }
+
+        .modal-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text1);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: var(--text3);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.08); color: var(--text1); }
+
+        .modal-body { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 20px 28px;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* ── FORM ── */
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-col { display: flex; flex-direction: column; gap: 6px; }
+        .form-col.full { grid-column: 1/-1; }
+
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .form-control {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text1);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+        .form-control::placeholder { color: var(--text4); }
+        .form-control:focus { border-color: var(--border-h); background: var(--bg4); box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.1); }
+
+        textarea.form-control { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+        .form-select { cursor: pointer; }
+        .form-select option { background: #1a1a1a; }
+
+        /* Imagen preview */
+        .img-preview-wrap {
+            position: relative;
+            height: 140px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+        }
+        .img-preview { width: 100%; height: 100%; object-fit: cover; }
+        .img-preview-placeholder {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100%; color: var(--text4); gap: 8px; font-size: 0.8rem;
+        }
+        .img-preview-placeholder svg { color: var(--text4); }
+
+        /* Ingredientes dinámicos */
+        .ingredients-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .ingredient-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            animation: slide-in 0.2s ease;
+        }
+
+        @keyframes slide-in {
+            from { opacity:0; transform: translateX(-10px); }
+            to   { opacity:1; transform: translateX(0); }
+        }
+
+        .ingredient-input { flex: 1; }
+
+        .btn-remove-ing {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(239,68,68,0.3);
+            background: rgba(239,68,68,0.06);
+            color: #EF4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+        .btn-remove-ing:hover { background: rgba(239,68,68,0.2); }
+
+        .btn-add-ing {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px dashed rgba(var(--primary-rgb),0.3);
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 4px;
+        }
+        .btn-add-ing:hover { background: rgba(var(--primary-rgb),0.08); border-style: solid; }
+
+        /* Toggle WA */
+        .toggle-row { display: flex; align-items: center; gap: 12px; }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--bg4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--text4);
+            left: 3px; top: 50%;
+            transform: translateY(-50%);
+            transition: var(--transition);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: rgba(34,197,94,0.2); border-color: #22C55E; }
+        .toggle-switch input:checked + .toggle-slider::before { background: #22C55E; transform: translate(18px,-50%); }
+
+        .toggle-label { font-size: 0.875rem; color: var(--text2); }
+
+        /* Botones modales */
+        .btn-cancel {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-sm);
+            color: var(--text3);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.06); color: var(--text1); }
+
+        .btn-save {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--primary-d), var(--primary));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-save:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(var(--primary-rgb),0.4); }
+
+        /* ── CONFIRM DIALOG ── */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .confirm-overlay.open { opacity: 1; pointer-events: all; }
+
+        .confirm-box {
+            background: var(--bg2);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+        .confirm-overlay.open .confirm-box { transform: scale(1); }
+
+        .confirm-icon { font-size: 3rem; margin-bottom: 12px; }
+        .confirm-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text1); margin-bottom: 8px; }
+        .confirm-message { font-size: 0.875rem; color: var(--text3); margin-bottom: 24px; }
+
+        .confirm-buttons { display: flex; gap: 12px; justify-content: center; }
+
+        .btn-confirm-delete {
+            padding: 10px 24px;
+            background: #EF4444;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-confirm-delete:hover { background: #DC2626; }
+
+        /* ── TOAST ── */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: toast-in 0.3s ease forwards;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .toast.success { background: linear-gradient(135deg,#15803d,#22c55e); }
+        .toast.error   { background: linear-gradient(135deg,#991b1b,#ef4444); }
+        .toast.info    { background: linear-gradient(135deg,#92400e,var(--primary)); }
+
+        @keyframes toast-in {
+            from { opacity:0; transform: translateY(12px) scale(0.95); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── SECTION TITLE ── */
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-heading h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text1);
+        }
+        .count-badge {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(var(--primary-rgb),0.1);
+            border: 1px solid rgba(var(--primary-rgb),0.2);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .topbar { padding: 0 16px; }
+            .main { padding: 24px 12px 60px; }
+            .form-grid-2 { grid-template-columns: 1fr; }
+            .products-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Web
+        </a>
+        <span class="topbar-title">🥖 <span>Delmi Soriano</span> — Gestión de Productos</span>
+    </div>
+    <button class="btn-add" id="btn-open-add">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo Producto
+    </button>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- Stats -->
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">
+            <span class="stat-chip-icon">📦</span>
+            <div>
+                <div class="stat-chip-val" id="stat-total">0</div>
+                <div class="stat-chip-label">Productos</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-chip-icon">🌿</span>
+            <div>
+                <div class="stat-chip-val" id="stat-ing">0</div>
+                <div class="stat-chip-label">Ingredientes totales</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-chip-icon">💬</span>
+            <div>
+                <div class="stat-chip-val" id="stat-wa">0</div>
+                <div class="stat-chip-label">Con WhatsApp</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar producto...">
+        </div>
+        <button class="btn-cancel" id="btn-reset" style="font-size:0.8rem; padding:10px 14px;">
+            Restablecer por defecto
+        </button>
+    </div>
+
+    <!-- Section heading -->
+    <div class="section-heading">
+        <h2>Catálogo de Productos</h2>
+        <span class="count-badge" id="count-label">0 productos</span>
+    </div>
+
+    <!-- Grid -->
+    <div class="products-grid" id="products-grid"></div>
+</main>
+
+<!-- ══════ MODAL AÑADIR / EDITAR ══════ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-title">Nuevo Producto</h2>
+            <button class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-index" value="-1">
+
+            <!-- Imagen + preview -->
+            <div class="form-col full">
+                <label class="form-label">Imagen del producto</label>
+                <div class="img-preview-wrap" id="img-preview-wrap">
+                    <div class="img-preview-placeholder" id="img-placeholder">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span>Vista previa de la imagen</span>
+                    </div>
+                    <img id="img-preview" class="img-preview" style="display:none" alt="preview">
+                </div>
+                <input type="text" class="form-control" id="field-imagen"
+                    placeholder="images/mi-producto.png  o  https://..." style="margin-top:8px">
+            </div>
+
+            <div class="form-grid-2">
+                <!-- Título -->
+                <div class="form-col">
+                    <label class="form-label" for="field-titulo">Título *</label>
+                    <input type="text" class="form-control" id="field-titulo" placeholder="Pan de Masa Madre">
+                </div>
+                <!-- Icono -->
+                <div class="form-col">
+                    <label class="form-label" for="field-icono">Icono (emoji) *</label>
+                    <input type="text" class="form-control" id="field-icono" placeholder="🍞" maxlength="4" style="font-size:1.4rem; text-align:center;">
+                </div>
+                <!-- CTA href -->
+                <div class="form-col">
+                    <label class="form-label" for="field-cta-href">Enlace del botón *</label>
+                    <input type="text" class="form-control" id="field-cta-href" placeholder="#contacto">
+                </div>
+                <!-- CTA texto -->
+                <div class="form-col">
+                    <label class="form-label" for="field-cta-texto">Texto del botón *</label>
+                    <input type="text" class="form-control" id="field-cta-texto" placeholder="Hacer Pedido →">
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-col full">
+                <label class="form-label" for="field-descripcion">Descripción *</label>
+                <textarea class="form-control" id="field-descripcion" placeholder="Describe brevemente este producto..."></textarea>
+            </div>
+
+            <!-- Ingredientes -->
+            <div class="form-col full">
+                <label class="form-label">Ingredientes</label>
+                <div class="ingredients-list" id="ingredients-list"></div>
+                <button class="btn-add-ing" id="btn-add-ingredient">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Añadir ingrediente
+                </button>
+            </div>
+
+            <!-- WhatsApp toggle -->
+            <div class="form-col full">
+                <label class="form-label">Opciones</label>
+                <div class="toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="field-wa">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">El botón abre WhatsApp (en lugar de ir al formulario)</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="btn-modal-cancel">Cancelar</button>
+            <button class="btn-save" id="btn-modal-save">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Guardar producto
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════ CONFIRM DIALOG ══════ -->
+<div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+        <div class="confirm-icon">🗑️</div>
+        <div class="confirm-title">¿Eliminar producto?</div>
+        <div class="confirm-message" id="confirm-message">Esta acción no se puede deshacer.</div>
+        <div class="confirm-buttons">
+            <button class="btn-cancel" id="btn-confirm-cancel">Cancelar</button>
+            <button class="btn-confirm-delete" id="btn-confirm-ok">Sí, eliminar</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toast-container"></div>
+
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   DATOS POR DEFECTO (sincronizados con script.js)
+════════════════════════════════════════════════════════════ */
+const PRODUCTOS_DEFAULT = [
+    {
+        id:'masa-madre', titulo:'Pan de Masa Madre', imagen:'images/service_1.png',
+        imgAlt:'Pan artesanal de masa madre', icono:'🍞',
+        descripcion:'Fermentación lenta de 24 horas. Corteza crujiente, miga alveolada y sabor profundo que solo la tradición puede dar.',
+        ingredientes:['Harina ecológica de trigo','Agua de manantial','Sal marina sin refinar','Masa madre (fermento vivo)'],
+        ctaTexto:'Hacer Pedido →', ctaHref:'#contacto', ctaWa:false
+    },
+    {
+        id:'bolleria-francesa', titulo:'Bollería Francesa', imagen:'images/service_2.png',
+        imgAlt:'Bollería francesa premium', icono:'🥐',
+        descripcion:'Croissants y viennoiserie laminados a mano con ingredientes de la máxima calidad.',
+        ingredientes:['Harina de fuerza T65','Mantequilla AOC francesa (82% M.G.)','Leche entera fresca','Huevos camperos','Azúcar de caña','Levadura fresca de panadero'],
+        ctaTexto:'Hacer Pedido →', ctaHref:'#contacto', ctaWa:false
+    },
+    {
+        id:'obrador', titulo:'Obrador Artesanal', imagen:'images/service_3.png',
+        imgAlt:'Proceso de amasado en el obrador', icono:'👐',
+        descripcion:'Todo se elabora a mano en nuestro obrador propio bajo supervisión personal en cada etapa.',
+        ingredientes:['Selección de harinas certificadas','Fermentaciones largas (12–24h)','Amasado y formado manual','Horneado en horno de piedra'],
+        ctaTexto:'Conocer Más →', ctaHref:'#nosotros', ctaWa:false
+    },
+    {
+        id:'reposteria', titulo:'Repostería de Ocasión', imagen:'images/service_4.png',
+        imgAlt:'Tartas y repostería artesanal', icono:'🎂',
+        descripcion:'Tartas personalizadas, macarons y petit fours para bodas, cumpleaños y eventos especiales.',
+        ingredientes:['Harina repostera ecológica','Huevos camperos (Cat. A)','Azúcar moreno integral','Mantequilla de calidad superior','Chocolate negro 70% cacao','Nata fresca de vaca'],
+        ctaTexto:'Consultar por WhatsApp →', ctaHref:'https://wa.me/TUNUMEROAQUI', ctaWa:true
+    },
+    {
+        id:'ingredientes', titulo:'Ingredientes Premium', imagen:'images/service_5.png',
+        imgAlt:'Harinas ecológicas y materias primas', icono:'🌿',
+        descripcion:'Seleccionamos las mejores harinas ecológicas, trigos antiguos y materias primas de productores locales.',
+        ingredientes:['Harinas molidas en piedra','Trigos ancestrales (espelta, kamut)','Semillas ecológicas certificadas','Aceite de oliva virgen extra','Miel de producción local','Sal rosa del Himalaya'],
+        ctaTexto:'Saber Más →', ctaHref:'#nosotros', ctaWa:false
+    },
+    {
+        id:'pedidos', titulo:'Pedidos & Entrega', imagen:'images/service_6.png',
+        imgAlt:'Servicio de pedidos y entrega', icono:'📦',
+        descripcion:'Realiza tu pedido con antelación y recógelo en tienda o recíbelo en casa con packaging sostenible.',
+        ingredientes:['Pedido mínimo 24h de antelación','Recogida en tienda (7:00–14:00)','Entrega a domicilio disponible','Packaging 100% eco-friendly'],
+        ctaTexto:'Hacer Pedido →', ctaHref:'#contacto', ctaWa:false
+    },
+];
+
+const LS_KEY = 'PANADERIA_PRODUCTOS';
+
+/* ════════════════════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════════════════════ */
+let productos = [];
+let deleteIndex = null;
+
+/* Cargar de localStorage o usar por defecto */
+function loadProductos() {
+    try {
+        const saved = localStorage.getItem(LS_KEY);
+        productos = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(PRODUCTOS_DEFAULT));
+    } catch {
+        productos = JSON.parse(JSON.stringify(PRODUCTOS_DEFAULT));
+    }
+}
+
+function saveProductos() {
+    localStorage.setItem(LS_KEY, JSON.stringify(productos));
+}
+
+/* ════════════════════════════════════════════════════════════
+   RENDER
+════════════════════════════════════════════════════════════ */
+function render(filtro = '') {
+    const grid = document.getElementById('products-grid');
+    const term = filtro.toLowerCase();
+    const lista = term
+        ? productos.filter(p =>
+            p.titulo.toLowerCase().includes(term) ||
+            p.descripcion.toLowerCase().includes(term) ||
+            p.ingredientes.some(i => i.toLowerCase().includes(term))
+          )
+        : productos;
+
+    document.getElementById('count-label').textContent =
+        `${lista.length} producto${lista.length !== 1 ? 's' : ''}`;
+    updateStats();
+
+    if (!lista.length) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <h3>${term ? 'Sin resultados' : 'No hay productos'}</h3>
+                <p>${term ? `Ningún producto coincide con "${filtro}".` : 'Crea tu primer producto con el botón "Nuevo Producto".'}</p>
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = lista.map(p => {
+        const realIdx = productos.indexOf(p);
+        const topIng = p.ingredientes.slice(0, 3);
+        const rest   = p.ingredientes.length - 3;
+        return `
+        <div class="product-card" id="card-${realIdx}">
+            <div class="product-card-img">
+                <img src="${p.imagen}" alt="${p.imgAlt}"
+                     onerror="this.src='images/hero_visual.png'">
+                <div class="product-card-img-overlay">
+                    <span class="product-icon-badge">${p.icono}</span>
+                </div>
+            </div>
+            <div class="product-card-body">
+                <div class="product-card-title">${p.titulo}</div>
+                <div class="product-card-desc">${p.descripcion}</div>
+                <div class="product-ingredients-preview">
+                    ${topIng.map(i => `<span class="ingredient-pill">${i}</span>`).join('')}
+                    ${rest > 0 ? `<span class="ingredient-pill ingredient-pill-more">+${rest} más</span>` : ''}
+                </div>
+            </div>
+            <div class="product-card-footer">
+                <button class="btn-edit" onclick="openEdit(${realIdx})">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Editar
+                </button>
+                <button class="btn-duplicate" onclick="duplicate(${realIdx})" title="Duplicar">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                </button>
+                <button class="btn-delete" onclick="confirmDelete(${realIdx})" title="Eliminar">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function updateStats() {
+    document.getElementById('stat-total').textContent = productos.length;
+    document.getElementById('stat-ing').textContent =
+        productos.reduce((a, p) => a + p.ingredientes.length, 0);
+    document.getElementById('stat-wa').textContent =
+        productos.filter(p => p.ctaWa).length;
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════════════════════ */
+function openModal(titulo = 'Nuevo Producto') {
+    document.getElementById('modal-title').textContent = titulo;
+    document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    resetForm();
+}
+
+function resetForm() {
+    document.getElementById('edit-index').value = '-1';
+    document.getElementById('field-titulo').value     = '';
+    document.getElementById('field-icono').value      = '';
+    document.getElementById('field-imagen').value     = '';
+    document.getElementById('field-descripcion').value= '';
+    document.getElementById('field-cta-href').value   = '#contacto';
+    document.getElementById('field-cta-texto').value  = 'Hacer Pedido →';
+    document.getElementById('field-wa').checked       = false;
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('img-placeholder').style.display = 'flex';
+    document.getElementById('ingredients-list').innerHTML = '';
+    addIngredientRow('');
+}
+
+function openEdit(idx) {
+    const p = productos[idx];
+    document.getElementById('edit-index').value        = idx;
+    document.getElementById('field-titulo').value      = p.titulo;
+    document.getElementById('field-icono').value       = p.icono;
+    document.getElementById('field-imagen').value      = p.imagen;
+    document.getElementById('field-descripcion').value = p.descripcion;
+    document.getElementById('field-cta-href').value    = p.ctaHref;
+    document.getElementById('field-cta-texto').value   = p.ctaTexto;
+    document.getElementById('field-wa').checked        = p.ctaWa;
+    updateImgPreview(p.imagen);
+
+    const list = document.getElementById('ingredients-list');
+    list.innerHTML = '';
+    if (p.ingredientes.length) {
+        p.ingredientes.forEach(i => addIngredientRow(i));
+    } else {
+        addIngredientRow('');
+    }
+
+    openModal(`Editar: ${p.titulo}`);
+}
+
+/* ── Ingredientes dinámicos ── */
+function addIngredientRow(value = '') {
+    const list = document.getElementById('ingredients-list');
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+        <input type="text" class="form-control ingredient-input" value="${value}"
+            placeholder="Nombre del ingrediente..." autocomplete="off">
+        <button type="button" class="btn-remove-ing" title="Eliminar" onclick="removeIngRow(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+    list.appendChild(row);
+    row.querySelector('input').focus();
+}
+
+function removeIngRow(btn) {
+    const list = document.getElementById('ingredients-list');
+    if (list.children.length > 1) btn.closest('.ingredient-row').remove();
+    else btn.closest('.ingredient-row').querySelector('input').value = '';
+}
+
+/* ── Preview imagen ── */
+function updateImgPreview(src) {
+    const img = document.getElementById('img-preview');
+    const placeholder = document.getElementById('img-placeholder');
+    if (!src) {
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        return;
+    }
+    img.src = src;
+    img.onload  = () => { img.style.display='block'; placeholder.style.display='none'; };
+    img.onerror = () => { img.style.display='none';  placeholder.style.display='flex'; };
+}
+
+/* ── Guardar ── */
+function saveProducto() {
+    const idx   = parseInt(document.getElementById('edit-index').value);
+    const titulo = document.getElementById('field-titulo').value.trim();
+    const icono  = document.getElementById('field-icono').value.trim();
+    const imagen = document.getElementById('field-imagen').value.trim();
+    const desc   = document.getElementById('field-descripcion').value.trim();
+    const href   = document.getElementById('field-cta-href').value.trim();
+    const texto  = document.getElementById('field-cta-texto').value.trim();
+    const wa     = document.getElementById('field-wa').checked;
+
+    if (!titulo || !icono || !desc || !href || !texto) {
+        toast('Completa todos los campos obligatorios (*)', 'error');
+        return;
+    }
+
+    const ingredientes = [...document.querySelectorAll('#ingredients-list .ingredient-input')]
+        .map(i => i.value.trim()).filter(Boolean);
+
+    const prod = {
+        id:          titulo.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''),
+        titulo, icono, imagen: imagen || 'images/hero_visual.png',
+        imgAlt:      titulo,
+        descripcion: desc,
+        ingredientes,
+        ctaTexto:    texto,
+        ctaHref:     href,
+        ctaWa:       wa
+    };
+
+    if (idx === -1) {
+        productos.push(prod);
+        toast('✅ Producto añadido correctamente', 'success');
+    } else {
+        productos[idx] = prod;
+        toast('✏️ Producto actualizado', 'info');
+    }
+
+    saveProductos();
+    closeModal();
+    render(document.getElementById('search-input').value);
+}
+
+/* ── Duplicar ── */
+function duplicate(idx) {
+    const copia = JSON.parse(JSON.stringify(productos[idx]));
+    copia.titulo += ' (copia)';
+    copia.id     += '-copia';
+    productos.push(copia);
+    saveProductos();
+    render(document.getElementById('search-input').value);
+    toast('📋 Producto duplicado', 'info');
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONFIRM DELETE
+════════════════════════════════════════════════════════════ */
+function confirmDelete(idx) {
+    deleteIndex = idx;
+    document.getElementById('confirm-message').textContent =
+        `¿Seguro que quieres eliminar "${productos[idx].titulo}"? Esta acción no se puede deshacer.`;
+    document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function doDelete() {
+    if (deleteIndex == null) return;
+    const nombre = productos[deleteIndex].titulo;
+    productos.splice(deleteIndex, 1);
+    saveProductos();
+    deleteIndex = null;
+    document.getElementById('confirm-overlay').classList.remove('open');
+    render(document.getElementById('search-input').value);
+    toast(`🗑️ "${nombre}" eliminado`, 'error');
+}
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════════ */
+function toast(msg, type = 'info', duration = 3000) {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), duration);
+}
+
+/* ════════════════════════════════════════════════════════════
+   EVENTOS
+════════════════════════════════════════════════════════════ */
+document.getElementById('btn-open-add').addEventListener('click', () => {
+    resetForm();
+    openModal('Nuevo Producto');
+});
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
+document.getElementById('btn-modal-save').addEventListener('click', saveProducto);
+
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+});
+
+document.getElementById('btn-add-ingredient').addEventListener('click', () => addIngredientRow(''));
+
+document.getElementById('field-imagen').addEventListener('input', (e) => {
+    updateImgPreview(e.target.value.trim());
+});
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+    render(e.target.value);
+});
+
+document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    deleteIndex = null;
+});
+document.getElementById('btn-confirm-ok').addEventListener('click', doDelete);
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    if (!confirm('¿Restablecer al catálogo original? Se perderán todos los cambios.')) return;
+    localStorage.removeItem(LS_KEY);
+    loadProductos();
+    render();
+    toast('🔄 Catálogo restablecido', 'info');
+});
+
+/* Escape cierra modales */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeModal();
+        document.getElementById('confirm-overlay').classList.remove('open');
+    }
+});
+
+/* ════════════════════════════════════════════════════════════
+   INICIO
+════════════════════════════════════════════════════════════ */
+/* Verificar autenticación — requiere permiso admin_productos */
+if (!DS_AUTH.requireAuth('admin_productos')) { /* redirige si no tiene permiso */ }
+DS_AUTH.renderAdminNav('admin-productos.html');
+
+loadProductos();
+render();
+</script>
+</body>
+</html>
