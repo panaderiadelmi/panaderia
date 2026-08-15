@@ -1,20 +1,20 @@
 runConfig:
-  runtime: nodejs20
+  runtime: nodejs22
 
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    secret: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyDLUrs7qTgeqvV-MNenfn1zbAFyXorQ7oI
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: panaderiadelmisoriano.firebaseapp.com
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: panaderiadelmisoriano
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: panaderiadelmisoriano.firebasestorage.app
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "280619018116"
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    secret: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:280619018116:web:40f54b71a32cc335eb5fd1
+  - variable: NEXT_PUBLIC_BASE_URL
+    value: https://panaderia--panaderiadelmisoriano.europe-west4.hosted.app
   - variable: FIREBASE_ADMIN_SDK_JSON
     secret: FIREBASE_ADMIN_SDK_JSON
-  - variable: NEXT_PUBLIC_BASE_URL
-    value: https://panaderiadelmisoriano.web.app
