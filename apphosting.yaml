@@ -16,5 +16,3 @@ env:
     value: 1:280619018116:web:40f54b71a32cc335eb5fd1
   - variable: NEXT_PUBLIC_BASE_URL
     value: https://panaderia--panaderiadelmisoriano.europe-west4.hosted.app
-  - variable: FIREBASE_ADMIN_SDK_JSON
-    secret: FIREBASE_ADMIN_SDK_JSON
