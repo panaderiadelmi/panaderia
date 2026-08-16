@@ -37,7 +37,8 @@ export function BannerCarousel({ images }: Props) {
 
   return (
     <section
-      style={{ position: 'relative', width: '100%', height: 'clamp(340px, 60vh, 680px)', overflow: 'hidden', background: '#000' }}
+      className="banner-wrap"
+      style={{ position: 'relative', width: '100%', overflow: 'hidden', background: '#000' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Galería de imágenes"
