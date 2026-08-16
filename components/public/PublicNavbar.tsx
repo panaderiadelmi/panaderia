@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/lib/cart/CartProvider';
 import styles from './PublicNavbar.module.css';
@@ -21,8 +22,7 @@ export default function PublicNavbar() {
 
         {/* Logo */}
         <Link href="/" className={styles.logo}>
-          <span className={styles.logoText}>Señas Gómez</span>
-          <span className={styles.logoSub}>Horno de Leña</span>
+          <Image src="/images/logo.jpg" alt="Delmi Soriano — Panadería" width={44} height={44} style={{ borderRadius: '50%', objectFit: 'cover' }} />
         </Link>
 
         {/* Links */}

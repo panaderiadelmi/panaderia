@@ -32,3 +32,8 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Archivos locales de trabajo
+fotos/
+"listados productos/"
+public/images/banner/+IMAGENES/

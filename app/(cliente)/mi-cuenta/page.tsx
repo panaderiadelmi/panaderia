@@ -10,11 +10,16 @@ async function getPedidosCliente(clienteId: string): Promise<Pedido[]> {
   const snap = await adminDb
     .collection('pedidos')
     .where('clienteId', '==', clienteId)
-    .orderBy('createdAt', 'desc')
-    .limit(20)
     .get();
 
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Pedido);
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }) as Pedido)
+    .sort((a, b) => {
+      const aMs = (a as unknown as { createdAt?: { toMillis(): number } }).createdAt?.toMillis() ?? 0;
+      const bMs = (b as unknown as { createdAt?: { toMillis(): number } }).createdAt?.toMillis() ?? 0;
+      return bMs - aMs;
+    })
+    .slice(0, 20);
 }
 
 export default async function MiCuentaPage() {

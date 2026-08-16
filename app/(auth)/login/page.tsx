@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client';
@@ -34,8 +35,7 @@ export default function LoginPage() {
 
       if (!res.ok) throw new Error('Error al iniciar sesión');
 
-      router.push(redirect);
-      router.refresh();
+      window.location.href = redirect;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '';
       if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
@@ -57,9 +57,7 @@ export default function LoginPage() {
         {/* Logo + título */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <Link href="/" style={{ display: 'inline-block', marginBottom: '16px' }}>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 }}>
-              <span className="gradient-text">Señas Gómez</span>
-            </span>
+            <Image src="/images/logo.jpg" alt="Delmi Soriano — Panadería" width={80} height={80} style={{ borderRadius: '50%', objectFit: 'cover' }} />
           </Link>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text-1)', marginBottom: '6px' }}>
             Accede a tu cuenta

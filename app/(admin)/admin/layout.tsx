@@ -3,17 +3,18 @@ import Link from 'next/link';
 import { getSession } from '@/lib/firebase/auth';
 
 const NAV_ITEMS = [
-  { href: '/admin',              label: 'Dashboard',  emoji: '📊' },
-  { href: '/admin/pedidos',      label: 'Pedidos',    emoji: '📋' },
-  { href: '/admin/catalogo',     label: 'Catálogo',   emoji: '📦' },
-  { href: '/admin/clientes',     label: 'Clientes',   emoji: '👥' },
+  { href: '/admin',              label: 'Dashboard',     emoji: '📊' },
+  { href: '/admin/pedidos',      label: 'Pedidos',       emoji: '📋' },
+  { href: '/admin/articulos',    label: 'Artículos',     emoji: '🗂️' },
+  { href: '/admin/catalogo',     label: 'Catálogo',      emoji: '📦' },
+  { href: '/admin/clientes',     label: 'Clientes',      emoji: '👥' },
   { href: '/admin/configuracion',label: 'Configuración', emoji: '⚙️' },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const sesion = await getSession();
 
-  if (!sesion)                        redirect('/login?redirect=/admin');
+  if (!sesion)                        redirect('/api/auth/logout');
   if (sesion.rol !== 'administrador') redirect('/');
 
   return (

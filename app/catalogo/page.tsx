@@ -12,34 +12,39 @@ export const metadata: Metadata = {
 
 export const revalidate = 60; // revalidar cada minuto
 
+function stripTimestamps<T extends Record<string, unknown>>(obj: T): T {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v && typeof v === 'object' && 'toMillis' in v) continue;
+    out[k] = v;
+  }
+  return out as T;
+}
+
 async function getProductosYCategorias() {
   const [prodSnap, catSnap] = await Promise.all([
-    adminDb
-      .collection('productos')
-      .where('disponible', '==', true)
-      .orderBy('categoria')
-      .orderBy('orden')
-      .get(),
-    adminDb
-      .collection('categorias')
-      .where('activa', '==', true)
-      .orderBy('orden')
-      .get(),
+    adminDb.collection('productos').where('disponible', '==', true).get(),
+    adminDb.collection('categorias').orderBy('orden').get(),
   ]);
 
-  const productos  = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }) as Producto & { id: string });
-  const categorias = catSnap.docs.map(d => ({ id: d.id, ...d.data() }) as Categoria & { id: string });
+  const productos = prodSnap.docs
+    .map(d => stripTimestamps({ id: d.id, ...d.data() }) as Producto & { id: string })
+    .filter(p => !p.mercados || p.mercados.length === 0 || p.mercados.includes('web'))
+    .sort((a, b) => a.categoria.localeCompare(b.categoria) || (a.orden ?? 0) - (b.orden ?? 0));
+
+  const categorias = catSnap.docs
+    .map(d => stripTimestamps({ id: d.id, ...d.data() }) as Categoria & { id: string })
+    .filter(c => c.activa);
 
   return { productos, categorias };
 }
 
 interface Props {
-  searchParams: Promise<{ cat?: string }>;
+  searchParams: { cat?: string };
 }
 
 export default async function CatalogoPage({ searchParams }: Props) {
-  const params     = await searchParams;
-  const catActiva  = params.cat ?? 'todos';
+  const catActiva = searchParams.cat ?? 'todos';
 
   const { productos, categorias } = await getProductosYCategorias();
 

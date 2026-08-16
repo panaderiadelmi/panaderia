@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { adminAuth } from './admin';
+import { adminAuth, adminDb } from './admin';
 import type { SesionUsuario, Rol } from '@/lib/types';
 
 const SESSION_COOKIE_NAME = '__session';
@@ -39,12 +39,15 @@ export async function getSession(): Promise<SesionUsuario | null> {
 
     const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
 
+    const perfil = await adminDb.collection('clientes').doc(decoded.uid).get();
+    const data   = perfil.data() ?? {};
+
     return {
       uid:       decoded.uid,
       email:     decoded.email ?? '',
-      nombre:    (decoded.nombre as string)    ?? '',
-      apellidos: (decoded.apellidos as string) ?? '',
-      rol:       (decoded.rol as Rol)          ?? 'cliente',
+      nombre:    (data.nombre as string)    || (decoded.name as string) || '',
+      apellidos: (data.apellidos as string) || '',
+      rol:       (decoded.rol as Rol)       ?? 'cliente',
     };
   } catch {
     return null;

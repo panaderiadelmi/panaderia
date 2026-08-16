@@ -28,10 +28,14 @@ export type Alergeno = typeof ALERGENOS[number];
 export interface Producto {
   id: string;
   nombre: string;
+  referencia?: string;
+  refProveedor?: string;
   categoria: CategoriaSlug;
   descripcion: string;
   peso: string;
+  unidades?: string;
   precioSinIVA: number;
+  precioCoste?: number;
   tipoIVA: TipoIVA;
   alergenos: Alergeno[];
   disponible: boolean;
@@ -39,9 +43,27 @@ export interface Producto {
   imagenes: string[];
   orden: number;
   destacado: boolean;
+  mercados?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+export const MERCADOS_OPCIONES = [
+  { value: 'web',       label: 'Tienda online' },
+  { value: 'tienda',    label: 'Tienda física' },
+  { value: 'mayorista', label: 'Mayorista' },
+] as const;
+
+export const UNIDADES_OPCIONES = [
+  { value: 'ud',      label: 'Unidades (ud)' },
+  { value: 'kg',      label: 'Kilogramos (kg)' },
+  { value: 'g',       label: 'Gramos (g)' },
+  { value: 'l',       label: 'Litros (l)' },
+  { value: 'ml',      label: 'Mililitros (ml)' },
+  { value: 'docena',  label: 'Docena' },
+  { value: 'bandeja', label: 'Bandeja' },
+  { value: 'pack',    label: 'Pack' },
+] as const;
 
 export interface ProductoConPrecio extends Producto {
   precioConIVA: number;
