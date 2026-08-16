@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface Props {
   sesion: { nombre: string; rol: string } | null;
@@ -22,7 +23,7 @@ export function HomeNavbar({ sesion }: Props) {
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 500,
       height: 'var(--navbar-h)',
-      background: scrolled ? 'rgba(0,0,0,0.92)' : 'transparent',
+      background: scrolled ? 'var(--navbar-bg-scrolled)' : 'transparent',
       backdropFilter: scrolled ? 'blur(20px)' : 'none',
       borderBottom: scrolled ? '1px solid var(--color-border-amber)' : '1px solid transparent',
       transition: 'all 0.3s ease',
@@ -59,6 +60,7 @@ export function HomeNavbar({ sesion }: Props) {
 
         {/* CTA + Auth */}
         <div className="desktop-nav-cta" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <ThemeToggle />
           <Link href="/catalogo" className="btn-primary" style={{ padding: '9px 20px', fontSize: '0.85rem' }}>
             Pedir ahora
           </Link>
@@ -92,7 +94,7 @@ export function HomeNavbar({ sesion }: Props) {
       {menuOpen && (
         <div style={{
           position: 'absolute', top: 'var(--navbar-h)', left: 0, right: 0,
-          background: 'rgba(5,5,5,0.97)', backdropFilter: 'blur(20px)',
+          background: 'var(--mobile-menu-bg)', backdropFilter: 'blur(20px)',
           borderBottom: '1px solid var(--color-border-amber)',
           padding: '16px 24px 24px', display: 'flex', flexDirection: 'column', gap: '8px',
         }}>
@@ -107,9 +109,12 @@ export function HomeNavbar({ sesion }: Props) {
               {link.label}
             </Link>
           ))}
-          <Link href="/catalogo" className="btn-primary" onClick={() => setMenuOpen(false)} style={{ marginTop: '12px', justifyContent: 'center' }}>
-            Pedir ahora
-          </Link>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '12px', alignItems: 'center' }}>
+            <Link href="/catalogo" className="btn-primary" onClick={() => setMenuOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>
+              Pedir ahora
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       )}
     </nav>

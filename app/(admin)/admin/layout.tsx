@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/firebase/auth';
 import { ROLES_ADMIN, ROLES_CONFIG } from '@/lib/types';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const NAV_ITEMS = [
   { href: '/admin',               label: 'Dashboard',     emoji: '📊' },
@@ -26,7 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Navbar admin */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 200,
-        background: 'rgba(5,5,5,0.97)', backdropFilter: 'blur(20px)',
+        background: 'var(--admin-nav-bg)', backdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--color-border-amber)',
         height: 'var(--navbar-h)',
         display: 'flex', alignItems: 'center',
@@ -49,6 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         {/* Ver web + usuario */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ThemeToggle />
           <Link href="/" target="_blank" className="btn-ghost" style={{ fontSize: '0.75rem' }}>
             🌐 Ver web
           </Link>

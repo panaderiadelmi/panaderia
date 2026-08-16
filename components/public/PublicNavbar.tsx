@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/lib/cart/CartProvider';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import styles from './PublicNavbar.module.css';
 
 const NAV_LINKS = [
@@ -61,6 +62,8 @@ export default function PublicNavbar() {
               <circle cx="12" cy="7" r="4"/>
             </svg>
           </Link>
+
+          <ThemeToggle />
 
           {/* CTA Pedir */}
           <Link href="/catalogo" className="btn-primary" style={{ fontSize: '0.82rem', padding: '9px 18px' }}>

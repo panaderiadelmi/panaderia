@@ -48,6 +48,13 @@
 
   /* ── Navbar ──────────────────────────────────────── */
   --navbar-h: 64px;
+
+  /* ── Tema ─────────────────────────────────────────── */
+  --hover-overlay:      rgba(255, 255, 255, 0.05);
+  --navbar-bg-scrolled: rgba(0, 0, 0, 0.92);
+  --pub-navbar-bg:      rgba(0, 0, 0, 0.92);
+  --admin-nav-bg:       rgba(5, 5, 5, 0.97);
+  --mobile-menu-bg:     rgba(5, 5, 5, 0.97);
 }
 
 /* ── Reset + base ───────────────────────────────────── */
@@ -154,7 +161,7 @@ a { color: inherit; text-decoration: none; }
 
 .btn-ghost:hover {
   color: var(--color-text-1);
-  background: rgba(255,255,255,0.05);
+  background: var(--hover-overlay);
   border-color: var(--color-border);
 }
 
@@ -334,3 +341,50 @@ a { color: inherit; text-decoration: none; }
 
   .historia-float { display: none !important; }
 }
+
+/* ── Modo claro ─────────────────────────────────────── */
+[data-theme="light"] {
+  --color-bg:           #FAF9F7;
+  --color-bg-alt:       #F3F1ED;
+  --color-bg-card:      rgba(0, 0, 0, 0.03);
+  --color-primary:      #B45309;
+  --color-primary-dim:  rgba(180, 83, 9, 0.1);
+  --color-primary-glow: rgba(180, 83, 9, 0.2);
+  --color-primary-rgb:  180, 83, 9;
+  --color-accent:       #92400E;
+  --color-accent-dim:   rgba(146, 64, 14, 0.1);
+  --color-text-1:       #111111;
+  --color-text-2:       #1F1F1F;
+  --color-text-3:       #404040;
+  --color-text-4:       #737373;
+  --color-border:       rgba(0, 0, 0, 0.1);
+  --color-border-amber: rgba(180, 83, 9, 0.25);
+  --hover-overlay:      rgba(0, 0, 0, 0.05);
+  --navbar-bg-scrolled: rgba(250, 249, 247, 0.95);
+  --pub-navbar-bg:      rgba(250, 249, 247, 0.95);
+  --admin-nav-bg:       rgba(250, 249, 247, 0.97);
+  --mobile-menu-bg:     rgba(250, 249, 247, 0.97);
+}
+
+[data-theme="light"] body {
+  background: var(--color-bg);
+  color: var(--color-text-2);
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(0, 0, 0, 0.025);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .form-input {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-1);
+}
+
+[data-theme="light"] .btn-secondary {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track { background: #F3F1ED; }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(180, 83, 9, 0.3); }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(180, 83, 9, 0.5); }

@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.92);
+  background: var(--pub-navbar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(245, 158, 11, 0.15);
@@ -67,7 +67,7 @@
 
 .link:hover {
   color: var(--color-text-1);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover-overlay);
 }
 
 .linkActive {
@@ -96,7 +96,7 @@
 
 .cartBtn:hover {
   color: var(--color-text-1);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover-overlay);
 }
 
 .cartBadge {
@@ -130,7 +130,7 @@
 
 .accountBtn:hover {
   color: var(--color-text-1);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hover-overlay);
 }
 
 .menuBtn {
@@ -148,7 +148,7 @@
   color: var(--color-text-1);
 }
 
-.menuBtn:hover { background: rgba(255,255,255,0.06); }
+.menuBtn:hover { background: var(--hover-overlay); }
 
 .bar {
   display: block;
@@ -168,7 +168,7 @@
   top: var(--navbar-h);
   left: 0;
   right: 0;
-  background: rgba(5,5,5,0.97);
+  background: var(--mobile-menu-bg);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border-amber);
   padding: 12px 24px 20px;
