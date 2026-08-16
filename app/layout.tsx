@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { CartProvider } from '@/lib/cart/CartProvider';
 
@@ -37,10 +38,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${plusJakartaSans.variable} ${inter.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.dataset.theme=t;}())` }} />
-      </head>
-      <body><CartProvider>{children}</CartProvider></body>
+      <body>
+        <Script id="theme-init" strategy="beforeInteractive">{`(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.dataset.theme=t;}())`}</Script>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
