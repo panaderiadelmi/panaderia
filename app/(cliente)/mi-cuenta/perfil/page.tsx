@@ -68,27 +68,6 @@ export default async function PerfilPage({
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '16px' }}>
-            Alergias e intolerancias
-          </h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-4)', marginBottom: '14px' }}>
-            Esta información nos ayuda a informarte si algún producto puede afectarte.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-            {ALERGENOS.map(a => (
-              <label key={a} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '0.875rem', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  name={`alergia_${a}`}
-                  defaultChecked={cliente?.alergias?.includes(a) ?? false}
-                  style={{ accentColor: 'var(--color-primary)', width: '16px', height: '16px' }}
-                />
-                {ALERGENOS_ES[a]}
-              </label>
-            ))}
-          </div>
-        </div>
 
         <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 28px' }}>
           Guardar cambios
