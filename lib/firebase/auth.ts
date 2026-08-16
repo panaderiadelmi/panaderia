@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import { adminAuth, adminDb } from './admin';
 import type { SesionUsuario, Rol } from '@/lib/types';
+import { ROLES_ADMIN } from '@/lib/types';
 
 const SESSION_COOKIE_NAME = '__session';
 const SESSION_DURATION_MS = 60 * 60 * 24 * 5 * 1000; // 5 días
@@ -47,7 +48,7 @@ export async function getSession(): Promise<SesionUsuario | null> {
       email:     decoded.email ?? '',
       nombre:    (data.nombre as string)    || (decoded.name as string) || '',
       apellidos: (data.apellidos as string) || '',
-      rol:       (decoded.rol as Rol)       ?? 'cliente',
+      rol:       (data.rol as Rol) || (decoded.rol as Rol) || 'cliente',
     };
   } catch {
     return null;
@@ -62,7 +63,7 @@ export async function requireRole(rol: Rol): Promise<SesionUsuario> {
     throw new Error('NO_AUTH');
   }
 
-  if (rol === 'administrador' && sesion.rol !== 'administrador') {
+  if (rol === 'administrador' && !ROLES_ADMIN.includes(sesion.rol)) {
     throw new Error('NO_PERMISSION');
   }
 

@@ -1,7 +1,16 @@
 import type { Timestamp } from 'firebase/firestore';
 
 // ── Roles ────────────────────────────────────────────────────────────────────
-export type Rol = 'cliente' | 'administrador';
+export type Rol = 'cliente' | 'administrador' | 'developer' | 'propietario';
+
+export const ROLES_ADMIN: Rol[] = ['administrador', 'developer', 'propietario'];
+
+export const ROLES_CONFIG: Record<Rol, { label: string; color: string }> = {
+  cliente:       { label: 'Cliente',       color: '#64748B' },
+  administrador: { label: 'Administrador', color: '#F59E0B' },
+  developer:     { label: 'Developer',     color: '#38BDF8' },
+  propietario:   { label: 'Propietario',   color: '#4ADE80' },
+};
 
 // ── Categorías ───────────────────────────────────────────────────────────────
 export type CategoriaSlug = 'candeal' | 'baguette' | 'blanco' | 'bolleria';

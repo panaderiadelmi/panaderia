@@ -1,21 +1,24 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/firebase/auth';
+import { ROLES_ADMIN, ROLES_CONFIG } from '@/lib/types';
 
 const NAV_ITEMS = [
-  { href: '/admin',              label: 'Dashboard',     emoji: '📊' },
-  { href: '/admin/pedidos',      label: 'Pedidos',       emoji: '📋' },
-  { href: '/admin/articulos',    label: 'Artículos',     emoji: '🗂️' },
-  { href: '/admin/catalogo',     label: 'Catálogo',      emoji: '📦' },
-  { href: '/admin/clientes',     label: 'Clientes',      emoji: '👥' },
-  { href: '/admin/configuracion',label: 'Configuración', emoji: '⚙️' },
+  { href: '/admin',               label: 'Dashboard',     emoji: '📊' },
+  { href: '/admin/pedidos',       label: 'Pedidos',       emoji: '📋' },
+  { href: '/admin/articulos',     label: 'Artículos',     emoji: '🗂️' },
+  { href: '/admin/catalogo',      label: 'Catálogo',      emoji: '📦' },
+  { href: '/admin/clientes',      label: 'Clientes',      emoji: '👥' },
+  { href: '/admin/configuracion', label: 'Configuración', emoji: '⚙️' },
+  { href: '/admin/roles',         label: 'Roles',         emoji: '🛡️' },
+  { href: '/admin/usuarios',      label: 'Usuarios',      emoji: '👤' },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const sesion = await getSession();
 
-  if (!sesion)                        redirect('/api/auth/logout');
-  if (sesion.rol !== 'administrador') redirect('/');
+  if (!sesion)                          redirect('/api/auth/logout');
+  if (!ROLES_ADMIN.includes(sesion.rol)) redirect('/');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -64,8 +67,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-1)', fontFamily: 'var(--font-display)' }}>
                 {sesion.nombre}
               </div>
-              <div style={{ fontSize: '0.62rem', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                👑 Admin
+              <div style={{ fontSize: '0.62rem', color: ROLES_CONFIG[sesion.rol]?.color ?? 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                {ROLES_CONFIG[sesion.rol]?.label ?? sesion.rol}
               </div>
             </div>
           </div>
