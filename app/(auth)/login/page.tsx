@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { Suspense, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client';
 
-export default function LoginPage() {
-  const router       = useRouter();
+function LoginForm() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') ?? '/mi-cuenta';
 
@@ -26,7 +25,6 @@ export default function LoginPage() {
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const idToken    = await credential.user.getIdToken();
 
-      // Crear cookie de sesión httpOnly en el servidor
       const res = await fetch('/api/auth/session', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +52,6 @@ export default function LoginPage() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
 
-        {/* Logo + título */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <Link href="/" style={{ display: 'inline-block', marginBottom: '16px' }}>
             <Image src="/images/logo.jpg" alt="Delmi Soriano — Panadería" width={80} height={80} style={{ borderRadius: '50%', objectFit: 'cover' }} />
@@ -67,7 +64,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Formulario */}
         <div className="glass-card" style={{ padding: '32px' }}>
           <form onSubmit={handleSubmit} noValidate>
             <div style={{ marginBottom: '20px' }}>
@@ -131,7 +127,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Links secundarios */}
         <div style={{ textAlign: 'center', marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <Link href="/registro" style={{ color: 'var(--color-text-3)', fontSize: '0.875rem' }}>
             ¿No tienes cuenta? <span style={{ color: 'var(--color-primary)' }}>Regístrate</span>
@@ -143,5 +138,13 @@ export default function LoginPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
