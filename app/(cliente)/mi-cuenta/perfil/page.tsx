@@ -1,16 +1,10 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { getSession } from '@/lib/firebase/auth';
 import { actualizarPerfil } from '@/lib/actions/perfil';
-import { ALERGENOS, type Cliente } from '@/lib/types';
+import { type Cliente } from '@/lib/types';
 import { redirect } from 'next/navigation';
 
 export const metadata = { title: 'Mi perfil' };
-
-const ALERGENOS_ES: Record<string, string> = {
-  gluten: 'Gluten', lacteos: 'Lácteos', huevos: 'Huevos',
-  frutos_secos: 'Frutos secos', sesamo: 'Sésamo', soja: 'Soja',
-  apio: 'Apio', mostaza: 'Mostaza',
-};
 
 export default async function PerfilPage({
   searchParams,
@@ -67,7 +61,6 @@ export default async function PerfilPage({
             <input name="telefono" type="tel" className="form-input" defaultValue={cliente?.telefono ?? ''} placeholder="+34 600 000 000" />
           </div>
         </div>
-
 
         <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 28px' }}>
           Guardar cambios
