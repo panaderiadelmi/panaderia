@@ -36,7 +36,7 @@ export default function NuevoProductoPage() {
   );
 }
 
-export function ProductoFormCampos({ producto }: { producto?: Record<string, any> }) {
+function ProductoFormCampos({ producto }: { producto?: Record<string, any> }) {
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
