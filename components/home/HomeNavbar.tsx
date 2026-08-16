@@ -36,7 +36,7 @@ export function HomeNavbar({ sesion }: Props) {
         </Link>
 
         {/* Links desktop */}
-        <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+        <div className="desktop-nav-links" style={{ display: 'flex', gap: '4px', flex: 1 }}>
           {[
             { href: '/catalogo', label: 'Productos' },
             { href: '/#historia', label: 'Nuestra Historia' },
@@ -58,7 +58,7 @@ export function HomeNavbar({ sesion }: Props) {
         </div>
 
         {/* CTA + Auth */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="desktop-nav-cta" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Link href="/catalogo" className="btn-primary" style={{ padding: '9px 20px', fontSize: '0.85rem' }}>
             Pedir ahora
           </Link>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 export default function PublicNavbar() {
   const { totalUnidades } = useCart();
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className={styles.nav} role="navigation" aria-label="Menú principal">
@@ -64,9 +66,40 @@ export default function PublicNavbar() {
           <Link href="/catalogo" className="btn-primary" style={{ fontSize: '0.82rem', padding: '9px 18px' }}>
             Pedir ahora
           </Link>
+
+          {/* Hamburger */}
+          <button
+            className={styles.menuBtn}
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Menú"
+            aria-expanded={menuOpen}
+          >
+            <span className={`${styles.bar} ${menuOpen ? styles.barTop : ''}`} />
+            <span className={`${styles.bar} ${menuOpen ? styles.barMid : ''}`} />
+            <span className={`${styles.bar} ${menuOpen ? styles.barBot : ''}`} />
+          </button>
         </div>
 
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className={styles.mobileMenu} role="menu">
+          {NAV_LINKS.map(l => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={styles.mobileLink}
+              onClick={() => setMenuOpen(false)}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <Link href="/mi-cuenta" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+            Mi cuenta
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }

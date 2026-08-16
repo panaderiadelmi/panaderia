@@ -288,3 +288,49 @@ a { color: inherit; text-decoration: none; }
   transition: color 0.2s;
 }
 .link-muted:hover { color: var(--color-text-1); }
+
+/* ── Responsive layouts ─────────────────────────────── */
+.grid-hero     { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.grid-historia { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.grid-contacto { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.grid-3col     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-gallery  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4col     { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.grid-footer   { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+
+/* Mobile nav helpers */
+.mobile-nav-toggle { }
+.desktop-nav-links { }
+.desktop-nav-cta   { }
+
+/* ── Breakpoint: tablet 641–1024px ─────────────────── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid-historia { gap: 48px; }
+  .grid-contacto { gap: 40px; }
+  .grid-3col     { grid-template-columns: repeat(2, 1fr); }
+  .grid-4col     { grid-template-columns: repeat(2, 1fr); }
+  .grid-footer   { grid-template-columns: 1fr 1fr; gap: 28px; }
+}
+
+/* ── Breakpoint: mobile ≤768px (nav) ─────────────────── */
+@media (max-width: 768px) {
+  .mobile-nav-toggle { display: flex !important; }
+  .desktop-nav-links { display: none !important; }
+  .desktop-nav-cta   { display: none !important; }
+}
+
+/* ── Breakpoint: mobile ≤640px ──────────────────────── */
+@media (max-width: 640px) {
+  section { padding-top: 52px !important; padding-bottom: 52px !important; }
+  footer  { padding-top: 40px !important; padding-bottom: 24px !important; }
+
+  .grid-hero     { grid-template-columns: 1fr; gap: 32px; }
+  .grid-historia { grid-template-columns: 1fr; gap: 32px; }
+  .grid-contacto { grid-template-columns: 1fr; gap: 32px; }
+  .grid-3col     { grid-template-columns: 1fr; gap: 16px; }
+  .grid-gallery  { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-4col     { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-footer   { grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .historia-float { display: none !important; }
+}

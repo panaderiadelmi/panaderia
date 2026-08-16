@@ -58,7 +58,7 @@ export default async function HomePage() {
           <Image src="/images/exterior.jpg" alt="" fill style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
         </div>
 
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px', width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <div className="grid-hero" style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px', width: '100%', position: 'relative', zIndex: 1 }}>
 
           {/* Texto */}
           <div>
@@ -164,7 +164,7 @@ export default async function HomePage() {
 
       {/* ── NUESTRA HISTORIA ─────────────────────────────────────────── */}
       <section id="historia" style={{ padding: '100px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+        <div className="grid-historia" style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
           {/* Fotos */}
           <div style={{ position: 'relative' }}>
@@ -172,7 +172,7 @@ export default async function HomePage() {
               <Image src="/images/local.jpg" alt="Interior de la panadería" fill style={{ objectFit: 'cover' }} />
             </div>
             {/* Foto pequeña superpuesta */}
-            <div style={{
+            <div className="historia-float" style={{
               position: 'absolute', bottom: '-24px', right: '-24px',
               width: '180px', height: '220px', borderRadius: 'var(--radius-lg)', overflow: 'hidden',
               border: '3px solid var(--color-bg)', boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
@@ -180,7 +180,7 @@ export default async function HomePage() {
               <Image src="/images/obrador1.jpg" alt="El obrador" fill style={{ objectFit: 'cover' }} />
             </div>
             {/* Métricas */}
-            <div style={{
+            <div className="historia-float" style={{
               position: 'absolute', top: '24px', right: '-20px',
               background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)',
               border: '1px solid var(--color-border-amber)', borderRadius: 'var(--radius-lg)',
@@ -255,7 +255,7 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+          <div className="grid-4col">
             {[
               { num: '01', icon: '🌾', title: 'Selección', desc: 'Elegimos harinas de molinos locales y trigos de calidad certificada. Harina Arandina para el candeal, CV18 para baguettes.' },
               { num: '02', icon: '⏳', title: 'Fermentación', desc: 'Dejamos reposar la masa hasta 24 horas con masa madre propia. Sin levaduras industriales.' },
@@ -283,7 +283,7 @@ export default async function HomePage() {
               El Obrador, <span className="gradient-text">Cada Mañana</span>
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <div className="grid-gallery">
             {['/images/obrador1.jpg', '/images/obrador2.jpg', '/images/obrador3.jpg'].map((src, i) => (
               <div key={i} style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', aspectRatio: '4/3', position: 'relative', border: '1px solid var(--color-border)' }}>
                 <Image src={src} alt="Obrador artesanal Señas Gómez" fill style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} />
@@ -304,7 +304,7 @@ export default async function HomePage() {
               Opiniones que nos <span className="gradient-text">Hacen Crecer</span>
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          <div className="grid-3col">
             {[
               { initials: 'MG', name: 'María García', role: 'Cliente habitual', text: 'El mejor pan candeal que he probado en mi vida. El sabor te transporta directamente a una panadería de pueblo. ¡Una experiencia única!' },
               { initials: 'RL', name: 'Rosa López', role: 'Vecina del barrio', text: 'Llevo años comprando aquí cada mañana. El pan de horno de leña no tiene comparación con nada de lo que venden en el supermercado.' },
@@ -362,7 +362,7 @@ export default async function HomePage() {
 
       {/* ── CONTACTO ─────────────────────────────────────────────────── */}
       <section id="contacto" style={{ padding: '80px 24px', borderTop: '1px solid var(--color-border)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'start' }}>
+        <div className="grid-contacto" style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div>
             <p style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-display)', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
               Contacto
@@ -426,7 +426,7 @@ export default async function HomePage() {
       {/* ── FOOTER ───────────────────────────────────────────────────── */}
       <footer style={{ borderTop: '1px solid var(--color-border)', padding: '48px 24px 32px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', marginBottom: '40px' }}>
+          <div className="grid-footer">
 
             {/* Marca */}
             <div>
