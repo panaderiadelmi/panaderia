@@ -1,5 +1,6 @@
 import { adminDb } from '@/lib/firebase/admin';
-import { guardarPermisos, PERMISOS, PERMISOS_DEFAULT } from '@/lib/actions/roles';
+import { guardarPermisos } from '@/lib/actions/roles';
+import { PERMISOS, PERMISOS_DEFAULT } from '@/lib/data/permisos';
 import { ROLES_CONFIG } from '@/lib/types';
 
 export const metadata = { title: 'Roles y permisos — Admin' };
