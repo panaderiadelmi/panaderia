@@ -37,12 +37,28 @@ export function BannerCarousel({ images }: Props) {
 
   return (
     <section
-      style={{ position: 'relative', width: '100%', paddingBottom: '27.96%', height: 0, overflow: 'hidden', background: '#ddd1b8' }}
+      style={{ position: 'relative', width: '100%', overflow: 'hidden', background: '#ddd1b8' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Galería de imágenes"
     >
-      {/* Slides */}
+      {/*
+        Imagen fantasma con dimensiones reales (869×243).
+        width:100% + height:auto → el section toma la altura proporcional
+        exacta en cualquier pantalla. visibility:hidden → no se ve pero
+        ocupa espacio para definir el alto del contenedor.
+      */}
+      <Image
+        src={images[0]}
+        width={869}
+        height={243}
+        alt=""
+        aria-hidden
+        style={{ width: '100%', height: 'auto', display: 'block', visibility: 'hidden' }}
+        priority
+      />
+
+      {/* Slides superpuestos sobre la imagen fantasma */}
       {images.map((src, i) => (
         <div
           key={src}
@@ -61,36 +77,14 @@ export function BannerCarousel({ images }: Props) {
             style={{ objectFit: 'contain' }}
             priority={i === 0}
           />
-          {/* Overlay degradado inferior */}
-          <div aria-hidden style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%)',
-          }} />
-          {/* Overlay degradado ámbar sutil */}
-          <div aria-hidden style={{
-            position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse 70% 50% at 50% 100%, rgba(245,158,11,0.08) 0%, transparent 70%)',
-          }} />
         </div>
       ))}
 
       {/* Flechas (solo si hay más de 1 imagen) */}
       {images.length > 1 && (
         <>
-          <button
-            onClick={prev}
-            style={{ ...btnBase, left: '16px' }}
-            aria-label="Imagen anterior"
-          >
-            ‹
-          </button>
-          <button
-            onClick={next}
-            style={{ ...btnBase, right: '16px' }}
-            aria-label="Imagen siguiente"
-          >
-            ›
-          </button>
+          <button onClick={prev} style={{ ...btnBase, left: '16px' }} aria-label="Imagen anterior">‹</button>
+          <button onClick={next} style={{ ...btnBase, right: '16px' }} aria-label="Imagen siguiente">›</button>
         </>
       )}
 
@@ -106,20 +100,16 @@ export function BannerCarousel({ images }: Props) {
               onClick={() => goTo(i)}
               aria-label={`Ir a imagen ${i + 1}`}
               style={{
-                width: i === current ? '28px' : '8px',
-                height: '8px',
+                width: i === current ? '28px' : '8px', height: '8px',
                 borderRadius: '4px',
                 background: i === current ? 'var(--color-primary)' : 'rgba(255,255,255,0.45)',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
+                border: 'none', cursor: 'pointer', padding: 0,
                 transition: 'all 0.35s ease',
               }}
             />
           ))}
         </div>
       )}
-
     </section>
   );
 }
