@@ -195,6 +195,17 @@ export interface Factura {
   emitidaAt: Timestamp;
 }
 
+// ── Horario semanal ──────────────────────────────────────────────────────────
+export interface HorarioDia {
+  abierto: boolean;
+  manana: { desde: string; hasta: string };
+  tarde:  { desde: string; hasta: string };
+}
+
+export type DiaSemana = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
+
+export type HorarioSemanal = Record<DiaSemana, HorarioDia>;
+
 // ── Configuración de empresa ─────────────────────────────────────────────────
 export interface FranjaHoraria {
   id: string;
@@ -229,10 +240,15 @@ export interface ConfiguracionEmpresa {
   // Stripe (solo la clave pública; la secreta va en env)
   metodosActivos: MetodoPago[];
 
+  // Horario semanal estructurado
+  horarioSemanal: HorarioSemanal;
+
   // Marca
   nombreWeb: string;
   tagline: string;
   logoUrl: string;
+  bannerUrl: string;
+  faviconUrl: string;
   colorAcento: string;
   instagram: string;
   facebook: string;

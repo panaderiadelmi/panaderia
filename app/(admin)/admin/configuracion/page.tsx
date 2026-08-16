@@ -1,33 +1,36 @@
 import { getConfiguracion, guardarConfiguracion } from '@/lib/actions/configuracion';
+import { HorarioSection } from '@/components/admin/HorarioSection';
+import { MediaUploader }  from '@/components/admin/MediaUploader';
 import type { ConfiguracionEmpresa } from '@/lib/types';
 
 export const metadata = { title: 'Configuración — Admin' };
 
-const SECTIONSTYLE = {
-  display: 'flex', flexDirection: 'column' as const, gap: '16px',
-};
-
-const INPUT_STYLE = { marginBottom: 0 };
+const SECTIONSTYLE = { display: 'flex', flexDirection: 'column' as const, gap: '16px' };
 
 export default async function ConfiguracionPage({
   searchParams,
 }: {
-  searchParams: { guardado?: string };
+  searchParams: { guardado?: string; subido?: string };
 }) {
   const cfg = await getConfiguracion() as Partial<ConfiguracionEmpresa>;
+  const ok  = searchParams.guardado || searchParams.subido;
 
   return (
     <>
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Configuración de empresa</h1>
-        {searchParams.guardado && (
-          <p style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, marginTop: '8px' }}>
-            ✓ Cambios guardados correctamente
-          </p>
+      <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Configuración de empresa</h1>
+          <p style={{ color: 'var(--color-text-4)', fontSize: '0.85rem', marginTop: '4px' }}>Datos fiscales, horarios, medios y parámetros generales.</p>
+        </div>
+        {ok && (
+          <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem', alignSelf: 'center' }}>
+            ✓ {searchParams.subido ? 'Imagen subida correctamente' : 'Cambios guardados correctamente'}
+          </span>
         )}
       </div>
 
-      <form action={guardarConfiguracion} style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '760px' }}>
+      {/* ── Formulario principal ─────────────────────────────── */}
+      <form action={guardarConfiguracion} style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '800px' }}>
 
         {/* Datos fiscales */}
         <Section titulo="Datos fiscales">
@@ -58,7 +61,11 @@ export default async function ConfiguracionPage({
           </Grid2>
           <Campo label="Email público" name="emailPublico" type="email" defaultValue={cfg.emailPublico} />
           <Campo label="Dirección física del local" name="direccionFisica" defaultValue={cfg.direccionFisica} />
-          <Campo label="Horario de apertura (texto libre)" name="horario" defaultValue={cfg.horario} placeholder="Lun–Sáb, 7:00–14:00" />
+        </Section>
+
+        {/* Horario semanal */}
+        <Section titulo="Horario de apertura">
+          <HorarioSection inicial={cfg.horarioSemanal ?? {}} />
         </Section>
 
         {/* Pedidos */}
@@ -72,13 +79,13 @@ export default async function ConfiguracionPage({
         {/* Métodos de pago */}
         <Section titulo="Métodos de pago activos">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <CheckLabel name="metodo_stripe_card" checked={cfg.metodosActivos?.includes('stripe_card')} label="Tarjeta (Stripe)" />
-            <CheckLabel name="metodo_stripe_bizum" checked={cfg.metodosActivos?.includes('stripe_bizum')} label="Bizum (Stripe)" />
-            <CheckLabel name="metodo_efectivo_recogida" checked={cfg.metodosActivos?.includes('efectivo_recogida')} label="Pago en efectivo al recoger" />
+            <CheckLabel name="metodo_stripe_card"        checked={cfg.metodosActivos?.includes('stripe_card')}        label="Tarjeta (Stripe)" />
+            <CheckLabel name="metodo_stripe_bizum"       checked={cfg.metodosActivos?.includes('stripe_bizum')}       label="Bizum (Stripe)" />
+            <CheckLabel name="metodo_efectivo_recogida"  checked={cfg.metodosActivos?.includes('efectivo_recogida')}  label="Pago en efectivo al recoger" />
           </div>
         </Section>
 
-        {/* Marca */}
+        {/* Identidad web */}
         <Section titulo="Identidad web">
           <Grid2>
             <Campo label="Nombre web" name="nombreWeb" defaultValue={cfg.nombreWeb ?? 'Señas Gómez'} />
@@ -95,18 +102,18 @@ export default async function ConfiguracionPage({
           <Campo label="Título del hero" name="heroTitulo" defaultValue={cfg.heroTitulo} placeholder="Pan de verdad, de toda la vida" />
           <Campo label="Subtítulo" name="heroSubtitulo" defaultValue={cfg.heroSubtitulo} />
           <Grid3>
-            <Campo label="Años de oficio" name="statsAnios" type="number" defaultValue={cfg.statsAnios ?? 0} />
-            <Campo label="Clientes habituales" name="statsClientes" type="number" defaultValue={cfg.statsClientes ?? 0} />
-            <Campo label="Variedades diarias" name="statsVariedades" type="number" defaultValue={cfg.statsVariedades ?? 0} />
+            <Campo label="Años de oficio"     name="statsAnios"      type="number" defaultValue={cfg.statsAnios      ?? 0} />
+            <Campo label="Clientes habituales" name="statsClientes"   type="number" defaultValue={cfg.statsClientes   ?? 0} />
+            <Campo label="Variedades diarias"  name="statsVariedades" type="number" defaultValue={cfg.statsVariedades ?? 0} />
           </Grid3>
         </Section>
 
         {/* Textos legales */}
         <Section titulo="Textos legales">
-          <TextareaField label="Aviso Legal" name="avisoLegal" defaultValue={cfg.avisoLegal} />
+          <TextareaField label="Aviso Legal"           name="avisoLegal"          defaultValue={cfg.avisoLegal} />
           <TextareaField label="Política de Privacidad" name="politicaPrivacidad" defaultValue={cfg.politicaPrivacidad} />
-          <TextareaField label="Política de Cookies" name="politicaCookies" defaultValue={cfg.politicaCookies} />
-          <TextareaField label="Condiciones de Venta" name="condicionesVenta" defaultValue={cfg.condicionesVenta} />
+          <TextareaField label="Política de Cookies"    name="politicaCookies"    defaultValue={cfg.politicaCookies} />
+          <TextareaField label="Condiciones de Venta"   name="condicionesVenta"   defaultValue={cfg.condicionesVenta} />
         </Section>
 
         <div style={{ paddingTop: '8px' }}>
@@ -115,14 +122,67 @@ export default async function ConfiguracionPage({
           </button>
         </div>
       </form>
+
+      {/* ── Imágenes y recursos (formularios separados) ──────── */}
+      <div style={{ marginTop: '40px', maxWidth: '800px' }}>
+        <div className="glass-card" style={{ padding: '28px' }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            color: 'var(--color-text-3)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginBottom: '4px',
+          }}>
+            Imágenes y recursos
+          </h2>
+          <p style={{ fontSize: '0.78rem', color: 'var(--color-text-4)', marginBottom: '20px' }}>
+            Cada imagen se sube de forma independiente. Los cambios se aplican inmediatamente en la web.
+          </p>
+
+          <MediaUploader
+            tipo="logo"
+            label="Logo"
+            descripcion="Aparece en la barra de navegación, facturas y correos. Recomendado: PNG cuadrado, mínimo 200×200 px."
+            currentUrl={cfg.logoUrl}
+          />
+
+          <MediaUploader
+            tipo="banner"
+            label="Banner principal"
+            descripcion="Carrusel de la portada. Para mejor resultado usa imágenes de 869×243 px o proporción 16:4,5."
+            currentUrl={cfg.bannerUrl}
+          />
+
+          <MediaUploader
+            tipo="favicon"
+            label="Favicon"
+            descripcion="Icono de la pestaña del navegador. Formatos: ICO, PNG o SVG, tamaño ideal 32×32 px."
+            currentUrl={cfg.faviconUrl}
+          />
+
+          <div style={{ paddingTop: '8px' }} />
+        </div>
+      </div>
     </>
   );
 }
 
+/* ── Componentes auxiliares ────────────────────────────────────── */
+
 function Section({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="glass-card" style={{ padding: '24px' }}>
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '18px' }}>
+      <h2 style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: '0.9rem',
+        fontWeight: 700,
+        color: 'var(--color-text-3)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.06em',
+        marginBottom: '18px',
+      }}>
         {titulo}
       </h2>
       <div style={SECTIONSTYLE}>{children}</div>
@@ -138,7 +198,9 @@ function Grid3({ children }: { children: React.ReactNode }) {
   return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>{children}</div>;
 }
 
-function Campo({ label, name, defaultValue, type = 'text', placeholder }: { label: string; name: string; defaultValue?: any; type?: string; placeholder?: string }) {
+function Campo({ label, name, defaultValue, type = 'text', placeholder }: {
+  label: string; name: string; defaultValue?: any; type?: string; placeholder?: string;
+}) {
   return (
     <div>
       <label className="form-label">{label}</label>
@@ -159,7 +221,8 @@ function TextareaField({ label, name, defaultValue }: { label: string; name: str
 function CheckLabel({ name, checked, label }: { name: string; checked?: boolean; label: string }) {
   return (
     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9rem' }}>
-      <input type="checkbox" name={name} defaultChecked={checked ?? false} style={{ accentColor: 'var(--color-primary)', width: '16px', height: '16px' }} />
+      <input type="checkbox" name={name} defaultChecked={checked ?? false}
+        style={{ accentColor: 'var(--color-primary)', width: '16px', height: '16px' }} />
       {label}
     </label>
   );
