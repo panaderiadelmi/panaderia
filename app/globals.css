@@ -289,9 +289,6 @@ a { color: inherit; text-decoration: none; }
 }
 .link-muted:hover { color: var(--color-text-1); }
 
-/* ── Banner ─────────────────────────────────────────── */
-.banner-wrap { aspect-ratio: 869 / 243; max-height: 520px; }
-
 /* ── Responsive layouts ─────────────────────────────── */
 .grid-hero     { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
 .grid-historia { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }

@@ -37,8 +37,7 @@ export function BannerCarousel({ images }: Props) {
 
   return (
     <section
-      className="banner-wrap"
-      style={{ position: 'relative', width: '100%', overflow: 'hidden', background: '#000' }}
+      style={{ position: 'relative', width: '100%', paddingBottom: '27.96%', height: 0, overflow: 'hidden', background: '#ddd1b8' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Galería de imágenes"
@@ -59,7 +58,7 @@ export function BannerCarousel({ images }: Props) {
             alt={`Señas Gómez — imagen ${i + 1}`}
             fill
             sizes="100vw"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit: 'contain' }}
             priority={i === 0}
           />
           {/* Overlay degradado inferior */}
