@@ -25,7 +25,7 @@ function LoginForm() {
     try {
       const snap = await getDocs(query(collection(db, 'clientes'), where('usernameLower', '==', username.trim().toLowerCase())));
       if (snap.empty) {
-        setError('Usuario o contraseña incorrectos.');
+        setError('El usuario no existe. Revisa el nombre o regístrate.');
         setLoading(false);
         return;
       }
