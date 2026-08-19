@@ -1,7 +1,7 @@
 import type { Rol } from '@/lib/types';
 
 export const PERMISOS = [
-  { key: 'admin.dashboard',      label: 'Dashboard',         desc: 'Ver estadísticas del panel' },
+  { key: 'admin.dashboard',      label: 'Panel',             desc: 'Ver estadísticas del panel' },
   { key: 'admin.pedidos',        label: 'Pedidos',           desc: 'Ver y gestionar pedidos' },
   { key: 'admin.articulos',      label: 'Artículos',         desc: 'Ficha de artículos y precios' },
   { key: 'admin.catalogo',       label: 'Catálogo web',      desc: 'Productos visibles en la tienda' },

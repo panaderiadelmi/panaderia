@@ -7,7 +7,7 @@ const NAV_GROUPS = [
   {
     label: 'General',
     items: [
-      { href: '/admin',         label: 'Dashboard',    emoji: '📊', exact: true },
+      { href: '/admin',         label: 'Panel',        emoji: '📊', exact: true },
       { href: '/admin/pedidos', label: 'Pedidos',      emoji: '📋' },
     ],
   },

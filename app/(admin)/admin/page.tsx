@@ -3,7 +3,7 @@ import { ESTADOS_PEDIDO } from '@/lib/types';
 import type { Pedido } from '@/lib/types';
 import Link from 'next/link';
 
-export const metadata = { title: 'Dashboard — Admin' };
+export const metadata = { title: 'Panel — Admin' };
 
 async function getDashboardData() {
   const [pedidosSnap, productosSnap, clientesSnap] = await Promise.all([
@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
     <>
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>
-          Dashboard
+          Panel
         </h1>
         <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>
           Resumen del negocio · {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
