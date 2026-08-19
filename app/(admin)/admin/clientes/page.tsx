@@ -1,6 +1,7 @@
 import { adminDb } from '@/lib/firebase/admin';
 import type { Cliente } from '@/lib/types';
 import { eliminarCliente } from '@/lib/actions/clientes';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Clientes — Admin' };
@@ -74,12 +75,12 @@ export default async function AdminClientesPage({ searchParams }: { searchParams
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <Link href={`/admin/clientes/${c.uid}`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px' }}>Ver</Link>
                 <Link href={`/admin/clientes/${c.uid}/editar`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px' }}>Editar</Link>
-                <form action={eliminarCliente.bind(null, c.uid)}
-                  onSubmit={(e) => { if (!confirm(`¿Eliminar a ${c.nombre} ${c.apellidos}? Esta acción no se puede deshacer.`)) e.preventDefault(); }}>
-                  <button type="submit" className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}>
-                    Eliminar
-                  </button>
-                </form>
+                <DeleteButton
+                  action={eliminarCliente.bind(null, c.uid)}
+                  mensaje={`¿Eliminar a ${c.nombre} ${c.apellidos}? Esta acción no se puede deshacer.`}
+                  className="btn-ghost"
+                  style={{ fontSize: '0.75rem', padding: '6px 10px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}
+                />
               </div>
             </div>
           ))}

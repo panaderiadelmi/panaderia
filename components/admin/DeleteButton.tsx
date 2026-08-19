@@ -1,16 +1,24 @@
 'use client';
 
-export function DeleteButton({ action }: { action: () => Promise<void> }) {
+interface Props {
+  action: () => Promise<void>;
+  mensaje?: string;
+  label?: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export function DeleteButton({ action, mensaje = '¿Eliminar? Esta acción no se puede deshacer.', label = 'Eliminar', className = 'btn-danger', style }: Props) {
   return (
-    <form
-      action={action}
-      onSubmit={e => {
-        if (!window.confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) {
-          e.preventDefault();
-        }
-      }}
-    >
-      <button type="submit" className="btn-danger">Eliminar</button>
+    <form action={action}>
+      <button
+        type="submit"
+        className={className}
+        style={style}
+        onClick={(e) => { if (!confirm(mensaje)) e.preventDefault(); }}
+      >
+        {label}
+      </button>
     </form>
   );
 }

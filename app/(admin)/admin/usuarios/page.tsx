@@ -1,6 +1,7 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { ROLES_ADMIN, ROLES_CONFIG, type Rol } from '@/lib/types';
 import { eliminarUsuarioPrivilegiado } from '@/lib/actions/roles';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Usuarios privilegiados — Admin' };
@@ -83,12 +84,12 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { c
                         <Link href={`/admin/usuarios/${u.id}`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 12px' }}>
                           Editar
                         </Link>
-                        <form action={eliminarUsuarioPrivilegiado.bind(null, u.id)}
-                          onSubmit={(e) => { if (!confirm(`¿Eliminar a ${u.nombre} ${u.apellidos}? Esta acción no se puede deshacer.`)) e.preventDefault(); }}>
-                          <button type="submit" className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 12px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}>
-                            Eliminar
-                          </button>
-                        </form>
+                        <DeleteButton
+                          action={eliminarUsuarioPrivilegiado.bind(null, u.id)}
+                          mensaje={`¿Eliminar a ${u.nombre} ${u.apellidos}? Esta acción no se puede deshacer.`}
+                          className="btn-ghost"
+                          style={{ fontSize: '0.75rem', padding: '6px 12px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}
+                        />
                       </div>
                     </td>
                   </tr>
