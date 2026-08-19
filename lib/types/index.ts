@@ -148,6 +148,8 @@ export interface Cliente {
   apellidos: string;
   email: string;
   telefono: string;
+  username: string;
+  usernameLower: string;
   alergias: Alergeno[];
   notasAdmin?: string;
   rol: Rol;

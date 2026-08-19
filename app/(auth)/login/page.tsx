@@ -5,13 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase/client';
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') ?? '/mi-cuenta';
 
-  const [email,    setEmail]    = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
@@ -22,6 +23,13 @@ function LoginForm() {
     setLoading(true);
 
     try {
+      const snap = await getDocs(query(collection(db, 'clientes'), where('usernameLower', '==', username.trim().toLowerCase())));
+      if (snap.empty) {
+        setError('Usuario o contraseña incorrectos.');
+        setLoading(false);
+        return;
+      }
+      const email = snap.docs[0].data().email as string;
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const idToken    = await credential.user.getIdToken();
 
@@ -37,7 +45,7 @@ function LoginForm() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '';
       if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
-        setError('Email o contraseña incorrectos.');
+        setError('Usuario o contraseña incorrectos.');
       } else if (msg.includes('too-many-requests')) {
         setError('Demasiados intentos. Espera unos minutos e inténtalo de nuevo.');
       } else {
@@ -67,16 +75,16 @@ function LoginForm() {
         <div className="glass-card" style={{ padding: '32px' }}>
           <form onSubmit={handleSubmit} noValidate>
             <div style={{ marginBottom: '20px' }}>
-              <label className="form-label" htmlFor="email">Email</label>
+              <label className="form-label" htmlFor="username">Nombre de usuario</label>
               <input
-                id="email"
-                type="email"
+                id="username"
+                type="text"
                 className="form-input"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="tu_usuario"
                 required
-                autoComplete="email"
+                autoComplete="username"
                 autoFocus
               />
             </div>

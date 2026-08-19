@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 import type { Cliente } from '@/lib/types';
 
@@ -16,6 +16,7 @@ export default function RegistroPage() {
     apellidos: '',
     email:     '',
     telefono:  '',
+    username:  '',
     password:  '',
     password2: '',
   });
@@ -31,6 +32,10 @@ export default function RegistroPage() {
     e.preventDefault();
     setError('');
 
+    if (!form.username.trim()) {
+      setError('El nombre de usuario es obligatorio.');
+      return;
+    }
     if (form.password !== form.password2) {
       setError('Las contraseñas no coinciden.');
       return;
@@ -42,25 +47,36 @@ export default function RegistroPage() {
 
     setLoading(true);
     try {
-      // 1. Crear usuario en Firebase Auth
+      // 1. Comprobar que el username no está en uso
+      const usernameLower = form.username.trim().toLowerCase();
+      const snap = await getDocs(query(collection(db, 'clientes'), where('usernameLower', '==', usernameLower)));
+      if (!snap.empty) {
+        setError('Ese nombre de usuario ya está en uso. Elige otro.');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Crear usuario en Firebase Auth
       const credential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const { user }   = credential;
 
-      // 2. Actualizar displayName
+      // 3. Actualizar displayName
       await updateProfile(user, {
         displayName: `${form.nombre} ${form.apellidos}`.trim(),
       });
 
-      // 3. Crear perfil en Firestore
+      // 4. Crear perfil en Firestore
       const clienteData: Omit<Cliente, 'createdAt' | 'updatedAt'> = {
-        uid:       user.uid,
-        nombre:    form.nombre.trim(),
-        apellidos: form.apellidos.trim(),
-        email:     form.email.toLowerCase().trim(),
-        telefono:  form.telefono.trim(),
-        alergias:  [],
-        rol:       'cliente',
-        activo:    true,
+        uid:          user.uid,
+        nombre:       form.nombre.trim(),
+        apellidos:    form.apellidos.trim(),
+        email:        form.email.toLowerCase().trim(),
+        telefono:     form.telefono.trim(),
+        username:     form.username.trim(),
+        usernameLower,
+        alergias:     [],
+        rol:          'cliente',
+        activo:       true,
       };
 
       await setDoc(doc(db, 'clientes', user.uid), {
@@ -69,7 +85,7 @@ export default function RegistroPage() {
         updatedAt: serverTimestamp(),
       });
 
-      // 4. Crear cookie de sesión
+      // 5. Crear cookie de sesión
       const idToken = await user.getIdToken();
       const res = await fetch('/api/auth/session', {
         method:  'POST',
@@ -137,6 +153,11 @@ export default function RegistroPage() {
             <div style={{ marginBottom: '16px' }}>
               <label className="form-label" htmlFor="telefono">Teléfono</label>
               <input id="telefono" type="tel" className="form-input" value={form.telefono} onChange={setField('telefono')} placeholder="+34 600 000 000" autoComplete="tel" />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label className="form-label" htmlFor="username">Nombre de usuario *</label>
+              <input id="username" type="text" className="form-input" value={form.username} onChange={setField('username')} placeholder="tu_usuario" required autoComplete="username" />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
