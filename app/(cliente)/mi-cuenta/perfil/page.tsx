@@ -3,6 +3,7 @@ import { getSession } from '@/lib/firebase/auth';
 import { actualizarPerfil } from '@/lib/actions/perfil';
 import { type Cliente } from '@/lib/types';
 import { redirect } from 'next/navigation';
+import { CambiarPassword } from '@/components/cliente/CambiarPassword';
 
 export const metadata = { title: 'Mi perfil' };
 
@@ -66,6 +67,8 @@ export default async function PerfilPage({
           Guardar cambios
         </button>
       </form>
+
+      <CambiarPassword email={sesion.email} />
     </>
   );
 }
