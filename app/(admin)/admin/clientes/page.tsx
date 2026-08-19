@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import type { Cliente } from '@/lib/types';
 import { eliminarCliente } from '@/lib/actions/clientes';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Clientes — Admin' };
@@ -26,8 +27,11 @@ export default async function AdminClientesPage({ searchParams }: { searchParams
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Clientes</h1>
           <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>{clientes.length} clientes registrados</p>
         </div>
-        {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente actualizado</span>}
-        {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente eliminado</span>}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente actualizado</span>}
+          {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente eliminado</span>}
+          <PrintButton />
+        </div>
       </div>
 
       {clientes.length === 0 ? (

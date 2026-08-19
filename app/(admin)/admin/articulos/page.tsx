@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { type Producto, MERCADOS_OPCIONES, calcularPrecioConIVA } from '@/lib/types';
 import { eliminarArticulo } from '@/lib/actions/articulos';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Artículos — Admin' };
@@ -23,7 +24,10 @@ export default async function AdminArticulosPage() {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Artículos</h1>
           <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>{articulos.length} artículos</p>
         </div>
-        <Link href="/admin/articulos/nuevo" className="btn-primary">+ Nuevo artículo</Link>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <PrintButton />
+          <Link href="/admin/articulos/nuevo" className="btn-primary">+ Nuevo artículo</Link>
+        </div>
       </div>
 
       {articulos.length === 0 ? (

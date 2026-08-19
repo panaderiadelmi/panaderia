@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { ROLES_ADMIN, ROLES_CONFIG, type Rol } from '@/lib/types';
 import { eliminarUsuarioPrivilegiado } from '@/lib/actions/roles';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Usuarios privilegiados — Admin' };
@@ -32,6 +33,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { c
           {searchParams.creado    && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario creado</span>}
           {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario actualizado</span>}
           {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario eliminado</span>}
+          <PrintButton />
           <Link href="/admin/usuarios/nuevo" className="btn-primary">+ Nuevo usuario</Link>
         </div>
       </div>

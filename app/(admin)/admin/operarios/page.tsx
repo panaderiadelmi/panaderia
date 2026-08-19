@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { type Operario, CATEGORIAS_OPERARIO, TIPOS_CONTRATO } from '@/lib/types';
 import { eliminarOperario } from '@/lib/actions/operarios';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Operarios — Admin' };
@@ -29,6 +30,7 @@ export default async function OperariosPage({
           {searchParams.creado    && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Operario creado</span>}
           {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Operario actualizado</span>}
           {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Operario eliminado</span>}
+          <PrintButton />
           <Link href="/admin/operarios/nuevo" className="btn-primary">+ Nuevo operario</Link>
         </div>
       </div>

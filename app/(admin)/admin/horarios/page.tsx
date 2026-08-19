@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { type HorarioOperario, TIPOS_HORAS } from '@/lib/types';
 import { eliminarHorario } from '@/lib/actions/operarios';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 
 export const metadata = { title: 'Horarios — Admin' };
@@ -29,6 +30,7 @@ export default async function HorariosPage({
           {searchParams.creado    && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Horario añadido</span>}
           {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Horario actualizado</span>}
           {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Horario eliminado</span>}
+          <PrintButton />
           <Link href="/admin/horarios/nuevo" className="btn-primary">+ Nuevo horario</Link>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { type Producto, type CategoriaSlug } from '@/lib/types';
 import { toggleDisponible, eliminarProducto } from '@/lib/actions/catalogo';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { PrintButton } from '@/components/admin/PrintButton';
 import Link from 'next/link';
 import { calcularPrecioConIVA } from '@/lib/types';
 
@@ -35,7 +36,10 @@ export default async function AdminCatalogoPage() {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Catálogo</h1>
           <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>{productos.length} productos</p>
         </div>
-        <Link href="/admin/catalogo/nuevo" className="btn-primary">+ Nuevo producto</Link>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <PrintButton />
+          <Link href="/admin/catalogo/nuevo" className="btn-primary">+ Nuevo producto</Link>
+        </div>
       </div>
 
       {(Object.entries(CATEGORIAS) as [CategoriaSlug, string][]).map(([slug, nombre]) => {

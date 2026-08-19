@@ -1,6 +1,7 @@
 import { getConfiguracion, guardarConfiguracion } from '@/lib/actions/configuracion';
 import { HorarioSection } from '@/components/admin/HorarioSection';
 import { MediaUploader }  from '@/components/admin/MediaUploader';
+import { PrintButton }    from '@/components/admin/PrintButton';
 import type { ConfiguracionEmpresa } from '@/lib/types';
 
 export const metadata = { title: 'Configuración — Admin' };
@@ -22,11 +23,14 @@ export default async function ConfiguracionPage({
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Configuración de empresa</h1>
           <p style={{ color: 'var(--color-text-4)', fontSize: '0.85rem', marginTop: '4px' }}>Datos fiscales, horarios, medios y parámetros generales.</p>
         </div>
-        {ok && (
-          <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem', alignSelf: 'center' }}>
-            ✓ {searchParams.subido ? 'Imagen subida correctamente' : 'Cambios guardados correctamente'}
-          </span>
-        )}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {ok && (
+            <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>
+              ✓ {searchParams.subido ? 'Imagen subida correctamente' : 'Cambios guardados correctamente'}
+            </span>
+          )}
+          <PrintButton />
+        </div>
       </div>
 
       {/* ── Formulario principal ─────────────────────────────── */}

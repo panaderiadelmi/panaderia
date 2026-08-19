@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { guardarPermisos } from '@/lib/actions/roles';
 import { PERMISOS, PERMISOS_DEFAULT } from '@/lib/data/permisos';
 import { ROLES_CONFIG } from '@/lib/types';
+import { PrintButton } from '@/components/admin/PrintButton';
 
 export const metadata = { title: 'Roles y permisos — Admin' };
 
@@ -28,11 +29,14 @@ export default async function RolesPage({ searchParams }: { searchParams: { guar
             Marca qué secciones puede ver cada rol. Los cambios se aplican en el próximo inicio de sesión.
           </p>
         </div>
-        {searchParams.guardado && (
-          <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>
-            ✓ Permisos guardados
-          </span>
-        )}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {searchParams.guardado && (
+            <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>
+              ✓ Permisos guardados
+            </span>
+          )}
+          <PrintButton />
+        </div>
       </div>
 
       <form action={guardarPermisos}>
