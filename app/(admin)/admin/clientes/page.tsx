@@ -36,16 +36,17 @@ export default async function AdminClientesPage({ searchParams }: { searchParams
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* Cabecera */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px auto', gap: '16px', padding: '8px 20px', fontSize: '0.72rem', color: 'var(--color-text-4)', fontFamily: 'var(--font-display)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px 130px 120px 80px auto', gap: '16px', padding: '8px 20px', fontSize: '0.72rem', color: 'var(--color-text-4)', fontFamily: 'var(--font-display)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             <span>Nombre</span>
             <span>Email</span>
+            <span>Usuario</span>
             <span>Teléfono</span>
             <span>Rol</span>
             <span></span>
           </div>
 
           {clientes.map(c => (
-            <div key={c.uid} className="glass-card" style={{ padding: '14px 20px', display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px auto', gap: '16px', alignItems: 'center' }}>
+            <div key={c.uid} className="glass-card" style={{ padding: '14px 20px', display: 'grid', gridTemplateColumns: '1fr 180px 130px 120px 80px auto', gap: '16px', alignItems: 'center' }}>
               <div>
                 <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>
                   {c.nombre} {c.apellidos}
@@ -56,6 +57,9 @@ export default async function AdminClientesPage({ searchParams }: { searchParams
               </div>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {c.email}
+              </span>
+              <span style={{ fontSize: '0.82rem', color: c.username ? 'var(--color-text-2)' : 'var(--color-text-4)', fontFamily: c.username ? 'var(--font-display)' : undefined }}>
+                {c.username || '—'}
               </span>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-3)' }}>
                 {c.telefono || '—'}
