@@ -36,6 +36,34 @@ export async function guardarPermisos(formData: FormData) {
   redirect('/admin/roles?guardado=1');
 }
 
+export async function editarUsuarioPrivilegiado(uid: string, formData: FormData) {
+  await requireAdminAccess();
+
+  const nombre    = (formData.get('nombre')    as string).trim();
+  const apellidos = (formData.get('apellidos') as string).trim();
+  const rol       = formData.get('rol')        as Rol;
+  const activo    = formData.get('activo') === 'true';
+
+  if (!ROLES_ADMIN.includes(rol)) throw new Error('Rol no válido');
+
+  await adminAuth.updateUser(uid, { displayName: `${nombre} ${apellidos}`.trim() });
+  await setUserRole(uid, rol);
+  await adminDb.collection('clientes').doc(uid).update({
+    nombre, apellidos, rol, activo, updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  revalidatePath('/admin/usuarios');
+  redirect('/admin/usuarios?editado=1');
+}
+
+export async function eliminarUsuarioPrivilegiado(uid: string) {
+  await requireAdminAccess();
+  await adminAuth.deleteUser(uid);
+  await adminDb.collection('clientes').doc(uid).delete();
+  revalidatePath('/admin/usuarios');
+  redirect('/admin/usuarios?eliminado=1');
+}
+
 export async function crearUsuarioPrivilegiado(formData: FormData) {
   await requireAdminAccess();
 

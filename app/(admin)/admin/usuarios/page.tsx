@@ -1,5 +1,6 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { ROLES_ADMIN, ROLES_CONFIG, type Rol } from '@/lib/types';
+import { eliminarUsuarioPrivilegiado } from '@/lib/actions/roles';
 import Link from 'next/link';
 
 export const metadata = { title: 'Usuarios privilegiados — Admin' };
@@ -14,7 +15,7 @@ async function getUsuariosAdmin() {
   });
 }
 
-export default async function UsuariosPage({ searchParams }: { searchParams: { creado?: string } }) {
+export default async function UsuariosPage({ searchParams }: { searchParams: { creado?: string; editado?: string; eliminado?: string } }) {
   const usuarios = await getUsuariosAdmin();
 
   return (
@@ -27,11 +28,9 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { c
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {searchParams.creado && (
-            <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>
-              ✓ Usuario creado
-            </span>
-          )}
+          {searchParams.creado    && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario creado</span>}
+          {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario actualizado</span>}
+          {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Usuario eliminado</span>}
           <Link href="/admin/usuarios/nuevo" className="btn-primary">+ Nuevo usuario</Link>
         </div>
       </div>
@@ -45,7 +44,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { c
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
-                {['Nombre', 'Email', 'Rol', 'Estado'].map(h => (
+                {['Nombre', 'Email', 'Rol', 'Estado', ''].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '12px 16px', fontFamily: 'var(--font-display)', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {h}
                   </th>
@@ -78,6 +77,19 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { c
                       }}>
                         {u.activo ? 'Activo' : 'Inactivo'}
                       </span>
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <Link href={`/admin/usuarios/${u.id}`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 12px' }}>
+                          Editar
+                        </Link>
+                        <form action={eliminarUsuarioPrivilegiado.bind(null, u.id)}
+                          onSubmit={(e) => { if (!confirm(`¿Eliminar a ${u.nombre} ${u.apellidos}? Esta acción no se puede deshacer.`)) e.preventDefault(); }}>
+                          <button type="submit" className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 12px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}>
+                            Eliminar
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 );
