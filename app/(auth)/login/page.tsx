@@ -4,7 +4,7 @@ import { Suspense, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 
@@ -12,10 +12,14 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') ?? '/mi-cuenta';
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [username,      setUsername]      = useState('');
+  const [password,      setPassword]      = useState('');
+  const [error,         setError]         = useState('');
+  const [loading,       setLoading]       = useState(false);
+  const [recovering,    setRecovering]    = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoveryMsg,   setRecoveryMsg]   = useState('');
+  const [recoverySent,  setRecoverySent]  = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -56,6 +60,18 @@ function LoginForm() {
     }
   }
 
+  async function handleRecovery(e: FormEvent) {
+    e.preventDefault();
+    setRecoveryMsg('');
+    try {
+      await sendPasswordResetEmail(auth, recoveryEmail.trim());
+      setRecoverySent(true);
+      setRecoveryMsg('Correo enviado. Revisa tu bandeja de entrada.');
+    } catch {
+      setRecoveryMsg('No se encontró ninguna cuenta con ese email.');
+    }
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -89,8 +105,14 @@ function LoginForm() {
               />
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label className="form-label" htmlFor="password">Contraseña</label>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                <label className="form-label" htmlFor="password" style={{ marginBottom: 0 }}>Contraseña</label>
+                <button type="button" onClick={() => { setRecovering(r => !r); setRecoveryMsg(''); setRecoverySent(false); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--color-primary)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
               <input
                 id="password"
                 type="password"
@@ -102,6 +124,29 @@ function LoginForm() {
                 autoComplete="current-password"
               />
             </div>
+
+            {recovering && (
+              <div style={{ marginBottom: '16px', padding: '16px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 'var(--radius-md)' }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-3)', marginBottom: '10px' }}>
+                  Introduce el email con el que te registraste y te enviaremos un enlace para restablecer tu contraseña.
+                </p>
+                <form onSubmit={handleRecovery} style={{ display: 'flex', gap: '8px' }}>
+                  <input type="email" className="form-input" value={recoveryEmail}
+                    onChange={e => setRecoveryEmail(e.target.value)}
+                    placeholder="tu@email.com" required style={{ flex: 1 }} disabled={recoverySent} />
+                  {!recoverySent && (
+                    <button type="submit" className="btn-secondary" style={{ whiteSpace: 'nowrap', fontSize: '0.82rem' }}>Enviar</button>
+                  )}
+                </form>
+                {recoveryMsg && (
+                  <p style={{ fontSize: '0.78rem', marginTop: '8px', color: recoverySent ? '#22c55e' : '#f87171', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+                    {recoveryMsg}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div style={{ marginBottom: '24px' }} />
 
             {error && (
               <div role="alert" style={{
