@@ -10,6 +10,8 @@ import { StatNumber } from '@/components/home/AnimatedStats';
 import { BannerCarousel } from '@/components/home/BannerCarousel';
 import type { HorarioSemanal, DiaSemana } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Señas Gómez — Panadería · Bollería · Horno de Leña',
   description: 'Pan candeal, baguettes y bollería artesanal elaborados cada día con masa madre, fermentaciones largas y horno de leña propio. Haz tu pedido online.',
