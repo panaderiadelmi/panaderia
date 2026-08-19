@@ -1,5 +1,6 @@
 import { adminDb } from '@/lib/firebase/admin';
 import type { Cliente } from '@/lib/types';
+import { eliminarCliente } from '@/lib/actions/clientes';
 import Link from 'next/link';
 
 export const metadata = { title: 'Clientes — Admin' };
@@ -14,14 +15,18 @@ async function contarPedidos(clienteId: string): Promise<number> {
   return snap.data().count;
 }
 
-export default async function AdminClientesPage() {
+export default async function AdminClientesPage({ searchParams }: { searchParams: { editado?: string; eliminado?: string } }) {
   const clientes = await getClientes();
 
   return (
     <>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Clientes</h1>
-        <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>{clientes.length} clientes registrados</p>
+      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Clientes</h1>
+          <p style={{ color: 'var(--color-text-3)', marginTop: '4px' }}>{clientes.length} clientes registrados</p>
+        </div>
+        {searchParams.editado   && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente actualizado</span>}
+        {searchParams.eliminado && <span style={{ color: 'var(--color-success)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Cliente eliminado</span>}
       </div>
 
       {clientes.length === 0 ? (
@@ -31,7 +36,7 @@ export default async function AdminClientesPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {/* Cabecera */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px 80px', gap: '16px', padding: '8px 20px', fontSize: '0.72rem', color: 'var(--color-text-4)', fontFamily: 'var(--font-display)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px auto', gap: '16px', padding: '8px 20px', fontSize: '0.72rem', color: 'var(--color-text-4)', fontFamily: 'var(--font-display)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             <span>Nombre</span>
             <span>Email</span>
             <span>Teléfono</span>
@@ -40,7 +45,7 @@ export default async function AdminClientesPage() {
           </div>
 
           {clientes.map(c => (
-            <div key={c.uid} className="glass-card" style={{ padding: '14px 20px', display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px 80px', gap: '16px', alignItems: 'center' }}>
+            <div key={c.uid} className="glass-card" style={{ padding: '14px 20px', display: 'grid', gridTemplateColumns: '1fr 220px 150px 80px auto', gap: '16px', alignItems: 'center' }}>
               <div>
                 <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>
                   {c.nombre} {c.apellidos}
@@ -62,9 +67,16 @@ export default async function AdminClientesPage() {
               }}>
                 {c.rol === 'administrador' ? '👑 Admin' : 'Cliente'}
               </span>
-              <Link href={`/admin/clientes/${c.uid}`} className="btn-ghost" style={{ fontSize: '0.75rem' }}>
-                Ver →
-              </Link>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <Link href={`/admin/clientes/${c.uid}`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px' }}>Ver</Link>
+                <Link href={`/admin/clientes/${c.uid}/editar`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px' }}>Editar</Link>
+                <form action={eliminarCliente.bind(null, c.uid)}
+                  onSubmit={(e) => { if (!confirm(`¿Eliminar a ${c.nombre} ${c.apellidos}? Esta acción no se puede deshacer.`)) e.preventDefault(); }}>
+                  <button type="submit" className="btn-ghost" style={{ fontSize: '0.75rem', padding: '6px 10px', color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.3)' }}>
+                    Eliminar
+                  </button>
+                </form>
+              </div>
             </div>
           ))}
         </div>
