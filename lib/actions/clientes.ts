@@ -6,14 +6,23 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function editarCliente(uid: string, formData: FormData) {
-  const nombre    = (formData.get('nombre')    as string).trim();
-  const apellidos = (formData.get('apellidos') as string).trim();
-  const telefono  = (formData.get('telefono')  as string).trim();
-  const activo    = formData.get('activo') === 'true';
+  const nombre       = (formData.get('nombre')    as string).trim();
+  const apellidos    = (formData.get('apellidos') as string).trim();
+  const telefono     = (formData.get('telefono')  as string).trim();
+  const username     = (formData.get('username')  as string).trim();
+  const usernameLower = username.toLowerCase();
+  const activo       = formData.get('activo') === 'true';
+
+  if (username) {
+    const snap = await adminDb.collection('clientes').where('usernameLower', '==', usernameLower).get();
+    if (!snap.empty && snap.docs[0].id !== uid) throw new Error('Ese nombre de usuario ya está en uso.');
+  }
 
   await adminAuth.updateUser(uid, { displayName: `${nombre} ${apellidos}`.trim() });
   await adminDb.collection('clientes').doc(uid).update({
-    nombre, apellidos, telefono, activo, updatedAt: FieldValue.serverTimestamp(),
+    nombre, apellidos, telefono, activo,
+    ...(username ? { username, usernameLower } : {}),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
   revalidatePath('/admin/clientes');

@@ -39,17 +39,26 @@ export async function guardarPermisos(formData: FormData) {
 export async function editarUsuarioPrivilegiado(uid: string, formData: FormData) {
   await requireAdminAccess();
 
-  const nombre    = (formData.get('nombre')    as string).trim();
-  const apellidos = (formData.get('apellidos') as string).trim();
-  const rol       = formData.get('rol')        as Rol;
-  const activo    = formData.get('activo') === 'true';
+  const nombre        = (formData.get('nombre')    as string).trim();
+  const apellidos     = (formData.get('apellidos') as string).trim();
+  const username      = (formData.get('username')  as string).trim();
+  const usernameLower = username.toLowerCase();
+  const rol           = formData.get('rol')        as Rol;
+  const activo        = formData.get('activo') === 'true';
 
   if (!ROLES_ADMIN.includes(rol)) throw new Error('Rol no válido');
+
+  if (username) {
+    const snap = await adminDb.collection('clientes').where('usernameLower', '==', usernameLower).get();
+    if (!snap.empty && snap.docs[0].id !== uid) throw new Error('Ese nombre de usuario ya está en uso.');
+  }
 
   await adminAuth.updateUser(uid, { displayName: `${nombre} ${apellidos}`.trim() });
   await setUserRole(uid, rol);
   await adminDb.collection('clientes').doc(uid).update({
-    nombre, apellidos, rol, activo, updatedAt: FieldValue.serverTimestamp(),
+    nombre, apellidos, rol, activo,
+    ...(username ? { username, usernameLower } : {}),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
   revalidatePath('/admin/usuarios');

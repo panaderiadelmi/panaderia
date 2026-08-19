@@ -43,6 +43,10 @@ export default async function EditarUsuarioPage({ params }: { params: { id: stri
             <label className="form-label">Email</label>
             <input type="email" disabled className="form-input" value={u.email} style={{ opacity: 0.5, cursor: 'not-allowed' }} />
           </div>
+          <div>
+            <label className="form-label">Nombre de usuario</label>
+            <input name="username" type="text" className="form-input" defaultValue={u.username ?? ''} placeholder="nombre_usuario" />
+          </div>
         </div>
 
         <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>

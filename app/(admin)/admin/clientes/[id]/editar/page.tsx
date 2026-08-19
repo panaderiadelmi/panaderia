@@ -45,6 +45,10 @@ export default async function EditarClientePage({ params }: { params: { id: stri
             <label className="form-label">Teléfono</label>
             <input name="telefono" type="tel" className="form-input" defaultValue={c.telefono ?? ''} placeholder="+34 600 000 000" />
           </div>
+          <div>
+            <label className="form-label">Nombre de usuario</label>
+            <input name="username" type="text" className="form-input" defaultValue={c.username ?? ''} placeholder="nombre_usuario" />
+          </div>
         </div>
 
         <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
