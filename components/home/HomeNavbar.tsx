@@ -73,6 +73,9 @@ export function HomeNavbar({ sesion }: Props) {
               Mi cuenta
             </Link>
           )}
+          <Link href="/admin" className="btn-ghost" style={{ fontSize: '0.82rem' }}>
+            Intranet
+          </Link>
         </div>
 
         {/* Mobile toggle */}

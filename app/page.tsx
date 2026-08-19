@@ -132,9 +132,6 @@ export default async function HomePage() {
               <Link href="#historia" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '13px 28px' }}>
                 Nuestra historia
               </Link>
-              <Link href="/admin" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '13px 28px' }}>
-                Intranet
-              </Link>
             </div>
 
             {/* Estadísticas */}
@@ -490,7 +487,7 @@ export default async function HomePage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                 <Image src="/images/logo.png" alt="Señas Gómez" width={32} height={32} style={{ borderRadius: '6px' }} />
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.95rem' }}>
-                  Señas <span style={{ color: 'var(--color-primary)' }}>Gómez</span>
+                  DELMI <span style={{ color: 'var(--color-primary)' }}>SORIANO</span>
                 </span>
               </div>
               <p style={{ fontSize: '0.85rem', color: 'var(--color-text-4)', lineHeight: 1.7, maxWidth: '260px' }}>
