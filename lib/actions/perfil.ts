@@ -23,6 +23,23 @@ export async function actualizarPerfil(formData: FormData) {
   redirect('/mi-cuenta/perfil?guardado=1');
 }
 
+export async function asignarUsernameAdmin(clienteId: string, formData: FormData) {
+  const username      = (formData.get('username') as string ?? '').trim();
+  const usernameLower = username.toLowerCase();
+
+  if (!username) throw new Error('El nombre de usuario no puede estar vacío.');
+
+  const snap = await adminDb.collection('clientes').where('usernameLower', '==', usernameLower).get();
+  if (!snap.empty && snap.docs[0].id !== clienteId) {
+    throw new Error('Ese nombre de usuario ya está en uso.');
+  }
+
+  await adminDb.collection('clientes').doc(clienteId).update({
+    username, usernameLower, updatedAt: FieldValue.serverTimestamp(),
+  });
+  revalidatePath(`/admin/clientes/${clienteId}`);
+}
+
 export async function guardarNotaAdminCliente(clienteId: string, formData: FormData) {
   await adminDb.collection('clientes').doc(clienteId).update({
     notasAdmin: (formData.get('notasAdmin') as string) ?? '',

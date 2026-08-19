@@ -1,6 +1,6 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { ESTADOS_PEDIDO, type Cliente, type Pedido } from '@/lib/types';
-import { guardarNotaAdminCliente } from '@/lib/actions/perfil';
+import { guardarNotaAdminCliente, asignarUsernameAdmin } from '@/lib/actions/perfil';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -74,11 +74,29 @@ export default async function AdminClienteDetallePage({ params }: { params: { id
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
               <Row label="Teléfono" value={cliente.telefono || '—'} />
               <Row label="Rol" value={cliente.rol} />
+              <Row label="Usuario" value={cliente.username || '—'} />
               {cliente.alergias?.length > 0 && (
                 <Row label="Alergias" value={cliente.alergias.join(', ')} />
               )}
             </div>
           </div>
+
+          {!cliente.username && (
+            <div className="glass-card" style={{ padding: '20px', border: '1px solid rgba(245,158,11,0.3)' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', marginBottom: '6px', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Asignar nombre de usuario
+              </h2>
+              <p style={{ fontSize: '0.78rem', color: 'var(--color-text-4)', marginBottom: '12px' }}>
+                Este cliente no tiene usuario asignado y no puede iniciar sesión.
+              </p>
+              <form action={asignarUsernameAdmin.bind(null, cliente.uid)}>
+                <input name="username" type="text" className="form-input" placeholder="nombre_usuario" required style={{ marginBottom: '10px' }} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" className="btn-primary" style={{ fontSize: '0.82rem', padding: '8px 16px' }}>Asignar</button>
+                </div>
+              </form>
+            </div>
+          )}
 
           <div className="glass-card" style={{ padding: '20px' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', marginBottom: '14px', color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
