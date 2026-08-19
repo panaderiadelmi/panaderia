@@ -133,6 +133,7 @@ export interface Pedido {
   metodoPago: MetodoPago;
   stripePaymentIntentId?: string;
   stripePaymentStatus?: string;
+  bultos?: number;
   facturaId?: string;
   facturaUrl?: string;
   notasCliente?: string;

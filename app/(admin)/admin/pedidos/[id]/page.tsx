@@ -1,8 +1,9 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { ESTADOS_PEDIDO, type Pedido, type EstadoPedido } from '@/lib/types';
-import { cambiarEstadoPedido, guardarNotaAdmin } from '@/lib/actions/pedidos';
+import { cambiarEstadoPedido, guardarNotaAdmin, actualizarBultos } from '@/lib/actions/pedidos';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { PrintButton } from '@/components/admin/PrintButton';
 
 export const metadata = { title: 'Detalle de pedido — Admin' };
 
@@ -41,6 +42,11 @@ export default async function AdminPedidoDetallePage({ params }: { params: { id:
           <p style={{ color: 'var(--color-text-3)', marginTop: '2px', fontSize: '0.85rem' }}>
             {pedido.clienteNombre} · {pedido.clienteEmail}
           </p>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link href={`/admin/pedidos/${pedido.id}/factura`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '7px 12px' }}>🧾 Factura</Link>
+          <Link href={`/admin/pedidos/${pedido.id}/recibo`}  className="btn-ghost" style={{ fontSize: '0.75rem', padding: '7px 12px' }}>🖨️ Recibo</Link>
+          <Link href={`/admin/pedidos/${pedido.id}/etiqueta`} className="btn-ghost" style={{ fontSize: '0.75rem', padding: '7px 12px' }}>📦 Etiqueta</Link>
         </div>
         <span className="badge" style={{ background: `${estadoActual.color}18`, border: `1px solid ${estadoActual.color}40`, color: estadoActual.color, fontSize: '0.8rem', padding: '6px 14px' }}>
           {estadoActual.emoji} {estadoActual.label}
@@ -182,6 +188,30 @@ export default async function AdminPedidoDetallePage({ params }: { params: { id:
                 {pedido.stripePaymentIntentId}
               </p>
             )}
+          </div>
+
+          {/* Bultos */}
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', marginBottom: '14px', color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Bultos
+            </h2>
+            <form action={actualizarBultos.bind(null, pedido.id)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input
+                type="number"
+                name="bultos"
+                min={1}
+                max={99}
+                defaultValue={pedido.bultos ?? 1}
+                className="form-input"
+                style={{ width: '70px', textAlign: 'center', padding: '6px 8px' }}
+              />
+              <button type="submit" className="btn-secondary" style={{ fontSize: '0.78rem', padding: '6px 12px' }}>
+                Guardar
+              </button>
+            </form>
+            <p style={{ fontSize: '0.72rem', color: 'var(--color-text-4)', marginTop: '8px' }}>
+              Número de paquetes para la etiqueta de envío.
+            </p>
           </div>
         </div>
       </div>

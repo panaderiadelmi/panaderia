@@ -22,3 +22,12 @@ export async function guardarNotaAdmin(pedidoId: string, formData: FormData) {
   });
   revalidatePath(`/admin/pedidos/${pedidoId}`);
 }
+
+export async function actualizarBultos(pedidoId: string, formData: FormData) {
+  const bultos = Math.max(1, parseInt(formData.get('bultos') as string) || 1);
+  await adminDb.collection('pedidos').doc(pedidoId).update({
+    bultos,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+  revalidatePath(`/admin/pedidos/${pedidoId}`);
+}
