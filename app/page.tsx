@@ -4,9 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getSession } from '@/lib/firebase/auth';
+import { getConfiguracion } from '@/lib/actions/configuracion';
 import { HomeNavbar } from '@/components/home/HomeNavbar';
 import { StatNumber } from '@/components/home/AnimatedStats';
 import { BannerCarousel } from '@/components/home/BannerCarousel';
+import type { HorarioSemanal, DiaSemana } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Señas Gómez — Panadería · Bollería · Horno de Leña',
@@ -27,9 +29,48 @@ function getBannerImages(): string[] {
   }
 }
 
+const DIAS_HS: { key: DiaSemana; short: string }[] = [
+  { key: 'lunes',     short: 'Lun' },
+  { key: 'martes',    short: 'Mar' },
+  { key: 'miercoles', short: 'Mié' },
+  { key: 'jueves',    short: 'Jue' },
+  { key: 'viernes',   short: 'Vie' },
+  { key: 'sabado',    short: 'Sáb' },
+  { key: 'domingo',   short: 'Dom' },
+];
+
+function horariosLineas(horario: HorarioSemanal): { dias: string; horas: string }[] {
+  const lineas: { dias: string; horas: string }[] = [];
+  let i = 0;
+  while (i < DIAS_HS.length) {
+    const h = horario[DIAS_HS[i].key];
+    if (!h?.abierto) {
+      let j = i + 1;
+      while (j < DIAS_HS.length && !horario[DIAS_HS[j].key]?.abierto) j++;
+      const rango = j - 1 > i ? `${DIAS_HS[i].short} – ${DIAS_HS[j - 1].short}` : DIAS_HS[i].short;
+      lineas.push({ dias: rango, horas: 'Cerrado' });
+      i = j;
+    } else {
+      const horas = `${h.manana.desde}–${h.manana.hasta} / ${h.tarde.desde}–${h.tarde.hasta}`;
+      let j = i + 1;
+      while (j < DIAS_HS.length) {
+        const nh = horario[DIAS_HS[j].key];
+        if (!nh?.abierto) break;
+        if (`${nh.manana.desde}–${nh.manana.hasta} / ${nh.tarde.desde}–${nh.tarde.hasta}` !== horas) break;
+        j++;
+      }
+      const rango = j - 1 > i ? `${DIAS_HS[i].short} – ${DIAS_HS[j - 1].short}` : DIAS_HS[i].short;
+      lineas.push({ dias: rango, horas });
+      i = j;
+    }
+  }
+  return lineas;
+}
+
 export default async function HomePage() {
   const sesion      = await getSession();
   const bannerImgs  = getBannerImages();
+  const cfg         = await getConfiguracion();
 
   return (
     <>
@@ -90,6 +131,9 @@ export default async function HomePage() {
               </Link>
               <Link href="#historia" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '13px 28px' }}>
                 Nuestra historia
+              </Link>
+              <Link href="/admin" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '13px 28px' }}>
+                Intranet
               </Link>
             </div>
 
@@ -375,8 +419,21 @@ export default async function HomePage() {
               escríbenos por WhatsApp o visítanos en tienda.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.2rem', marginTop: '2px' }}>🕐</span>
+                <div>
+                  <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--color-text-1)', marginBottom: '4px' }}>Horario</p>
+                  {cfg.horarioSemanal
+                    ? horariosLineas(cfg.horarioSemanal).map((l, i) => (
+                        <p key={i} style={{ color: 'var(--color-text-3)', fontSize: '0.875rem' }}>
+                          <span style={{ fontWeight: 600 }}>{l.dias}</span>: {l.horas}
+                        </p>
+                      ))
+                    : <p style={{ color: 'var(--color-text-3)', fontSize: '0.875rem' }}>Lun – Sáb, 7:00 – 14:00</p>
+                  }
+                </div>
+              </div>
               {[
-                { icon: '🕐', label: 'Horario', value: 'Lun – Sáb, 7:00 – 14:00' },
                 { icon: '📦', label: 'Pedidos especiales', value: 'Mínimo 24–48h de antelación' },
                 { icon: '🌾', label: 'Solo recogida en tienda', value: 'Sin envío a domicilio' },
               ].map(item => (
@@ -476,9 +533,16 @@ export default async function HomePage() {
                 Horario
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', color: 'var(--color-text-4)' }}>
-                <p>Lun – Sáb</p>
-                <p style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>7:00 – 14:00</p>
-                <p style={{ marginTop: '8px' }}>Domingo cerrado</p>
+                {cfg.horarioSemanal
+                  ? horariosLineas(cfg.horarioSemanal).map((l, i) => (
+                      <p key={i}>{l.dias}: <span style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>{l.horas}</span></p>
+                    ))
+                  : <>
+                      <p>Lun – Sáb</p>
+                      <p style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>7:00 – 14:00</p>
+                      <p style={{ marginTop: '8px' }}>Domingo cerrado</p>
+                    </>
+                }
               </div>
             </div>
           </div>

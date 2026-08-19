@@ -71,7 +71,7 @@ export async function guardarConfiguracion(formData: FormData) {
   redirect('/admin/configuracion?guardado=1');
 }
 
-export async function subirMedia(formData: FormData) {
+export async function subirMedia(formData: FormData): Promise<{ ok: true; url: string }> {
   const tipo    = formData.get('tipo')    as 'logo' | 'banner' | 'favicon';
   const archivo = formData.get('archivo') as File;
 
@@ -80,12 +80,13 @@ export async function subirMedia(formData: FormData) {
   const bytes  = await archivo.arrayBuffer();
   const buffer = Buffer.from(bytes);
   const ext    = archivo.name.split('.').pop()?.toLowerCase() ?? 'bin';
-  const path   = `config/${tipo}.${ext}`;
+  const storagePath = `config/${tipo}.${ext}`;
   const token  = crypto.randomUUID();
 
-  const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!;
+  const rawBucket  = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? '';
+  const bucketName = rawBucket.replace(/^gs:\/\//, '');
   const bucket     = adminStorage.bucket(bucketName);
-  const bucketFile = bucket.file(path);
+  const bucketFile = bucket.file(storagePath);
 
   await bucketFile.save(buffer, {
     metadata: {
@@ -94,7 +95,7 @@ export async function subirMedia(formData: FormData) {
     },
   });
 
-  const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${token}`;
+  const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media&token=${token}`;
 
   await adminDb.collection('configuracion').doc('empresa').set(
     { [`${tipo}Url`]: url, updatedAt: FieldValue.serverTimestamp() },
@@ -102,5 +103,5 @@ export async function subirMedia(formData: FormData) {
   );
 
   revalidatePath('/admin/configuracion');
-  redirect('/admin/configuracion?subido=1');
+  return { ok: true, url };
 }

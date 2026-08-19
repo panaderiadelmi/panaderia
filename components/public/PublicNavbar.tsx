@@ -55,20 +55,19 @@ export default function PublicNavbar() {
             )}
           </Link>
 
-          {/* Mi cuenta */}
-          <Link href="/mi-cuenta" className={styles.accountBtn} aria-label="Mi cuenta">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </Link>
-
-          <ThemeToggle />
-
-          {/* CTA Pedir */}
-          <Link href="/catalogo" className="btn-primary" style={{ fontSize: '0.82rem', padding: '9px 18px' }}>
-            Pedir ahora
-          </Link>
+          {/* Sólo desktop */}
+          <div className={styles.desktopOnly}>
+            <Link href="/mi-cuenta" className={styles.accountBtn} aria-label="Mi cuenta">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </Link>
+            <ThemeToggle />
+            <Link href="/catalogo" className="btn-primary" style={{ fontSize: '0.82rem', padding: '9px 18px' }}>
+              Pedir ahora
+            </Link>
+          </div>
 
           {/* Hamburger */}
           <button
@@ -88,6 +87,7 @@ export default function PublicNavbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className={styles.mobileMenu} role="menu">
+          <Link href="/" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Inicio</Link>
           {NAV_LINKS.map(l => (
             <Link
               key={l.href}
@@ -101,6 +101,12 @@ export default function PublicNavbar() {
           <Link href="/mi-cuenta" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
             Mi cuenta
           </Link>
+          <div className={styles.mobileCta}>
+            <Link href="/catalogo" className="btn-primary" onClick={() => setMenuOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>
+              Pedir ahora
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       )}
     </nav>

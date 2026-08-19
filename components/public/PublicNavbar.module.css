@@ -189,10 +189,24 @@
 
 .mobileLink:last-child { border-bottom: none; }
 
+.mobileCta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.desktopOnly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
-  .links   { display: none; }
-  .inner   { gap: 12px; }
-  .logo    { flex: 1; }
-  .menuBtn { display: flex; }
+  .links       { display: none; }
+  .inner       { gap: 12px; }
+  .logo        { flex: 1; }
+  .menuBtn     { display: flex; }
+  .desktopOnly { display: none; }
 }
