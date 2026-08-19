@@ -271,6 +271,83 @@ export interface ConfiguracionEmpresa {
   updatedAt: Timestamp;
 }
 
+// ── Operario ─────────────────────────────────────────────────────────────────
+export type TipoContrato =
+  | 'indefinido'
+  | 'temporal'
+  | 'parcial'
+  | 'obra'
+  | 'practicas'
+  | 'formativo'
+  | 'indefinido_discontinuo';
+
+export type CategoriaOperario =
+  | 'panadero'
+  | 'oficial'
+  | 'dependiente'
+  | 'repartidor'
+  | 'auxiliar'
+  | 'gerente';
+
+export type TipoHoras = 'ordinarias' | 'nocturnas' | 'festivas';
+
+export const TIPOS_CONTRATO: Record<TipoContrato, string> = {
+  indefinido:             'Indefinido',
+  temporal:               'Temporal',
+  parcial:                'A tiempo parcial',
+  obra:                   'Por obra o servicio',
+  practicas:              'En prácticas',
+  formativo:              'Formativo / Dual',
+  indefinido_discontinuo: 'Indefinido discontinuo',
+};
+
+export const CATEGORIAS_OPERARIO: Record<CategoriaOperario, string> = {
+  panadero:    'Panadero/a',
+  oficial:     'Oficial de panadería',
+  dependiente: 'Dependiente/a',
+  repartidor:  'Repartidor/a',
+  auxiliar:    'Auxiliar',
+  gerente:     'Gerente',
+};
+
+export const TIPOS_HORAS: Record<TipoHoras, string> = {
+  ordinarias: 'Ordinarias',
+  nocturnas:  'Nocturnas',
+  festivas:   'Festivas / Festivo',
+};
+
+export interface Operario {
+  id: string;
+  nombre: string;
+  apellidos: string;
+  categoria: CategoriaOperario;
+  telefono: string;
+  email: string;
+  nss: string;             // Número de Seguridad Social
+  numeroCuenta: string;    // IBAN
+  fechaNacimiento: string; // 'YYYY-MM-DD'
+  fechaInicio: string;     // 'YYYY-MM-DD' — inicio de contrato
+  tipoContrato: TipoContrato;
+  activo: boolean;
+  notas?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface HorarioOperario {
+  id: string;
+  operarioId: string;
+  operarioNombre: string;  // Desnormalizado para mostrar
+  fecha: string;           // 'YYYY-MM-DD'
+  horarioInicio: string;   // 'HH:MM'
+  horarioFin: string;      // 'HH:MM'
+  tipoHoras: TipoHoras;
+  horasExtras: number;
+  notas?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 // ── Helpers de cálculo ────────────────────────────────────────────────────────
 export function calcularPrecioConIVA(precioSinIVA: number, tipoIVA: TipoIVA): number {
   return Math.round(precioSinIVA * (1 + tipoIVA) * 100) / 100;
