@@ -45,7 +45,7 @@ function LoginForm() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : '';
       if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
-        setError('Usuario o contraseña incorrectos.');
+        setError('Contraseña incorrecta.');
       } else if (msg.includes('too-many-requests')) {
         setError('Demasiados intentos. Espera unos minutos e inténtalo de nuevo.');
       } else {
