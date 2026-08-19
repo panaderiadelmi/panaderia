@@ -7,8 +7,10 @@ import Link from 'next/link';
 export const metadata = { title: 'Editar horario — Admin' };
 
 async function getOperarios(): Promise<Pick<Operario, 'id' | 'nombre' | 'apellidos'>[]> {
-  const snap = await adminDb.collection('operarios').where('activo', '==', true).orderBy('apellidos').get();
-  return snap.docs.map(d => ({ id: d.id, nombre: d.data().nombre, apellidos: d.data().apellidos }));
+  const snap = await adminDb.collection('operarios').orderBy('apellidos').get();
+  return snap.docs
+    .filter(d => d.data().activo !== false)
+    .map(d => ({ id: d.id, nombre: d.data().nombre, apellidos: d.data().apellidos }));
 }
 
 export default async function EditarHorarioPage({

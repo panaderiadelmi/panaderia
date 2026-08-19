@@ -23,7 +23,7 @@ export default function NuevoOperarioPage() {
   );
 }
 
-export function OperarioFormFields({ defaultValues }: { defaultValues?: Record<string, string | boolean> }) {
+function OperarioFormFields({ defaultValues }: { defaultValues?: Record<string, string | boolean> }) {
   const v = defaultValues ?? {};
 
   return (
