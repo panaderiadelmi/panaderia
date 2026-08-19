@@ -4,12 +4,27 @@ import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { revalidatePath } from 'next/cache';
 import type { EstadoPedido } from '@/lib/types';
+import { sendEstadoEmail } from '@/lib/email/resend';
 
 export async function cambiarEstadoPedido(pedidoId: string, estado: EstadoPedido, _fd?: FormData) {
+  const snap = await adminDb.collection('pedidos').doc(pedidoId).get();
+  const pedido = snap.data();
+
   await adminDb.collection('pedidos').doc(pedidoId).update({
     estado,
     updatedAt: FieldValue.serverTimestamp(),
   });
+
+  if (pedido) {
+    sendEstadoEmail({
+      numero: pedido.numero,
+      clienteEmail: pedido.clienteEmail,
+      clienteNombre: pedido.clienteNombre,
+      estado,
+      franjaRecogida: pedido.franjaRecogida,
+    }).catch(() => {});
+  }
+
   revalidatePath('/admin');
   revalidatePath('/admin/pedidos');
   revalidatePath(`/admin/pedidos/${pedidoId}`);
