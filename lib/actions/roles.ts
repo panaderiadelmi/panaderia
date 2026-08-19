@@ -65,7 +65,7 @@ export async function editarUsuarioPrivilegiado(uid: string, formData: FormData)
   redirect('/admin/usuarios?editado=1');
 }
 
-export async function eliminarUsuarioPrivilegiado(uid: string) {
+export async function eliminarUsuarioPrivilegiado(uid: string, _fd?: FormData) {
   await requireAdminAccess();
   await adminAuth.deleteUser(uid);
   await adminDb.collection('clientes').doc(uid).delete();

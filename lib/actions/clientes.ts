@@ -30,7 +30,7 @@ export async function editarCliente(uid: string, formData: FormData) {
   redirect('/admin/clientes?editado=1');
 }
 
-export async function eliminarCliente(uid: string) {
+export async function eliminarCliente(uid: string, _fd?: FormData) {
   await adminAuth.deleteUser(uid);
   await adminDb.collection('clientes').doc(uid).delete();
   revalidatePath('/admin/clientes');
