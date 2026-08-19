@@ -1,7 +1,11 @@
 import { Resend } from 'resend';
 import type { EstadoPedido, FranjaRecogida } from '@/lib/types';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY!);
+  return _resend;
+}
 const FROM = 'Señas Gómez <pedidos@senasgomez.com>';
 
 interface EmailData {
@@ -68,7 +72,7 @@ export async function sendEstadoEmail(data: EmailData): Promise<void> {
   const tplFn = TEMPLATES[data.estado];
   if (!tplFn) return;
   const { subject, html } = tplFn(data);
-  await resend.emails.send({ from: FROM, to: data.clienteEmail, subject, html });
+  await getResend().emails.send({ from: FROM, to: data.clienteEmail, subject, html });
 }
 
 function buildHtml({ titulo, nombre, numero, cuerpo, franja }: {

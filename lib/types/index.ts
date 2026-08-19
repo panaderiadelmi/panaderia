@@ -89,12 +89,12 @@ export type EstadoPedido =
   | 'cancelado';
 
 export const ESTADOS_PEDIDO: Record<EstadoPedido, { label: string; color: string; emoji: string }> = {
-  pendiente:   { label: 'Pendiente',          color: '#94A3B8', emoji: '🕐' },
-  confirmado:  { label: 'Confirmado',          color: '#38BDF8', emoji: '✅' },
-  elaborando:  { label: 'En elaboración',      color: '#FBBF24', emoji: '🔥' },
-  listo:       { label: 'Listo para recoger',  color: '#4ADE80', emoji: '📦' },
-  recogido:    { label: 'Recogido',            color: '#A78BFA', emoji: '🏠' },
-  cancelado:   { label: 'Cancelado',           color: '#F87171', emoji: '❌' },
+  pendiente:   { label: 'Pendiente',        color: '#94A3B8', emoji: '🕐' },
+  confirmado:  { label: 'Confirmado',        color: '#38BDF8', emoji: '✅' },
+  elaborando:  { label: 'En preparación',   color: '#FBBF24', emoji: '🔥' },
+  listo:       { label: 'Preparado',         color: '#4ADE80', emoji: '📦' },
+  recogido:    { label: 'Completado',        color: '#A78BFA', emoji: '🏠' },
+  cancelado:   { label: 'Cancelado',         color: '#F87171', emoji: '❌' },
 };
 
 export type MetodoPago = 'stripe_card' | 'stripe_bizum' | 'efectivo_recogida';
@@ -129,6 +129,7 @@ export interface Pedido {
   ivaTotal: number;
   totalConIVA: number;
   estado: EstadoPedido;
+  tipoEntrega?: 'recogida' | 'envio';
   franjaRecogida: FranjaRecogida;
   metodoPago: MetodoPago;
   stripePaymentIntentId?: string;
