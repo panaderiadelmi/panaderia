@@ -98,7 +98,7 @@ export default async function HomePage() {
         }} />
         {/* Imagen de fondo difuminada */}
         <div aria-hidden style={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.08 }}>
-          <Image src="/images/exterior.jpg" alt="" fill style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
+          <Image src="/images/exterior.png" alt="" fill style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
         </div>
 
         <div className="grid-hero" style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 24px', width: '100%', position: 'relative', zIndex: 1 }}>
@@ -158,7 +158,7 @@ export default async function HomePage() {
           {/* Imagen hero */}
           <div style={{ position: 'relative', aspectRatio: '4/5', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: '0 0 60px rgba(245,158,11,0.15), 0 32px 80px rgba(0,0,0,0.5)' }}>
             <Image
-              src="/images/exterior.jpg"
+              src="/images/exterior.png"
               alt="Exterior de la panadería Señas Gómez"
               fill
               style={{ objectFit: 'cover', objectPosition: 'center' }}
@@ -487,7 +487,7 @@ export default async function HomePage() {
             {/* Marca */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                <Image src="/images/logo.png" alt="Señas Gómez" width={32} height={32} style={{ borderRadius: '6px' }} />
+                <Image src="/images/logo.jpg" alt="Señas Gómez" width={32} height={32} style={{ borderRadius: '6px' }} />
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.95rem' }}>
                   DELMI <span style={{ color: 'var(--color-primary)' }}>SORIANO</span>
                 </span>

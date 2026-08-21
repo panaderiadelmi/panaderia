@@ -36,7 +36,7 @@ next-env.d.ts
 # Archivos locales de trabajo
 fotos/
 listados productos/
-images/
+/images/
 *.docx
 ~$*.docx
 public/images/banner/+IMAGENES/
