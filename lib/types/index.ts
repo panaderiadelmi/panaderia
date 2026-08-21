@@ -257,6 +257,9 @@ export interface ConfiguracionEmpresa {
   instagram: string;
   facebook: string;
 
+  // Tienda online
+  tiendaActiva: boolean;
+
   // Hero
   heroTitulo: string;
   heroSubtitulo: string;

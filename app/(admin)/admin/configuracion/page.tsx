@@ -1,4 +1,4 @@
-import { getConfiguracion, guardarConfiguracion } from '@/lib/actions/configuracion';
+import { getConfiguracion, guardarConfiguracion, toggleTienda } from '@/lib/actions/configuracion';
 import { HorarioSection } from '@/components/admin/HorarioSection';
 import { MediaUploader }  from '@/components/admin/MediaUploader';
 import { PrintButton }    from '@/components/admin/PrintButton';
@@ -15,6 +15,7 @@ export default async function ConfiguracionPage({
 }) {
   const cfg = await getConfiguracion() as Partial<ConfiguracionEmpresa>;
   const ok  = searchParams.guardado || searchParams.subido;
+  const tiendaActiva = cfg.tiendaActiva ?? true;
 
   return (
     <>
@@ -31,6 +32,51 @@ export default async function ConfiguracionPage({
           )}
           <PrintButton />
         </div>
+      </div>
+
+      {/* ── Estado de la tienda ──────────────────────────────── */}
+      <div className="glass-card" style={{
+        padding: '24px 28px',
+        marginBottom: '8px',
+        maxWidth: '800px',
+        border: tiendaActiva ? '1px solid rgba(74,222,128,0.35)' : '1px solid rgba(248,113,113,0.35)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '24px',
+        flexWrap: 'wrap',
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+            <span style={{
+              width: '10px', height: '10px', borderRadius: '50%',
+              background: tiendaActiva ? 'var(--color-success)' : 'var(--color-error)',
+              display: 'inline-block',
+              boxShadow: tiendaActiva ? '0 0 6px rgba(74,222,128,0.6)' : '0 0 6px rgba(248,113,113,0.6)',
+            }} />
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1rem', color: 'var(--color-text-1)' }}>
+              {tiendaActiva ? 'Tienda online activa' : 'Tienda online desactivada'}
+            </span>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-4)', margin: 0 }}>
+            {tiendaActiva
+              ? 'Los clientes pueden realizar pedidos y compras normalmente.'
+              : 'Los clientes pueden navegar y registrarse, pero no efectuar compras.'}
+          </p>
+        </div>
+        <form action={toggleTienda.bind(null, !tiendaActiva)}>
+          <button
+            type="submit"
+            className={tiendaActiva ? 'btn-ghost' : 'btn-primary'}
+            style={{
+              fontSize: '0.85rem',
+              padding: '10px 22px',
+              ...(tiendaActiva ? { color: 'var(--color-error)', borderColor: 'rgba(248,113,113,0.4)' } : {}),
+            }}
+          >
+            {tiendaActiva ? 'Desactivar tienda' : 'Activar tienda'}
+          </button>
+        </form>
       </div>
 
       {/* ── Formulario principal ─────────────────────────────── */}

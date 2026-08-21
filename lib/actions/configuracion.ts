@@ -71,6 +71,17 @@ export async function guardarConfiguracion(formData: FormData) {
   redirect('/admin/configuracion?guardado=1');
 }
 
+export async function toggleTienda(activa: boolean, _fd?: FormData) {
+  await adminDb.collection('configuracion').doc('empresa').set(
+    { tiendaActiva: activa, updatedAt: FieldValue.serverTimestamp() },
+    { merge: true },
+  );
+  revalidatePath('/admin/configuracion');
+  revalidatePath('/catalogo');
+  revalidatePath('/checkout');
+  redirect('/admin/configuracion?tienda=1');
+}
+
 export async function subirMedia(formData: FormData): Promise<{ ok: true; url: string }> {
   const tipo    = formData.get('tipo')    as 'logo' | 'banner' | 'favicon';
   const archivo = formData.get('archivo') as File;

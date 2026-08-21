@@ -108,6 +108,22 @@ function ProductoFormCampos({ producto }: { producto?: Record<string, any> }) {
         </div>
       </div>
 
+      <div>
+        <label className="form-label" style={{ marginBottom: '10px' }}>Canales de venta</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+          {[
+            { key: 'web',       label: 'Tienda online (web)' },
+            { key: 'tienda',    label: 'Tienda física' },
+            { key: 'mayorista', label: 'Mayorista' },
+          ].map(({ key, label }) => (
+            <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
+              <input type="checkbox" name={`mercado_${key}`} defaultChecked={producto?.mercados?.includes(key) ?? false} style={{ accentColor: 'var(--color-primary)' }} />
+              {label}
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div style={{ display: 'flex', gap: '24px' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', cursor: 'pointer' }}>
           <input type="checkbox" name="disponible" defaultChecked={producto?.disponible ?? true} style={{ accentColor: 'var(--color-primary)' }} />

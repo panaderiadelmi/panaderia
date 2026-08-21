@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { adminDb } from '@/lib/firebase/admin';
 import type { Producto, Categoria } from '@/lib/types';
+import { getConfiguracion } from '@/lib/actions/configuracion';
 import PublicNavbar from '@/components/public/PublicNavbar';
 import CatalogoClient from '@/components/public/CatalogoClient';
 
@@ -46,7 +47,12 @@ interface Props {
 export default async function CatalogoPage({ searchParams }: Props) {
   const catActiva = searchParams.cat ?? 'todos';
 
-  const { productos, categorias } = await getProductosYCategorias();
+  const [{ productos, categorias }, cfg] = await Promise.all([
+    getProductosYCategorias(),
+    getConfiguracion(),
+  ]);
+
+  const tiendaActiva = cfg.tiendaActiva ?? true;
 
   return (
     <>
@@ -72,6 +78,25 @@ export default async function CatalogoPage({ searchParams }: Props) {
           </p>
         </div>
       </header>
+
+      {!tiendaActiva && (
+        <div style={{
+          background: 'rgba(248,113,113,0.08)',
+          border: '1px solid rgba(248,113,113,0.25)',
+          borderRadius: '12px',
+          padding: '16px 24px',
+          margin: '24px auto',
+          maxWidth: '760px',
+          textAlign: 'center',
+        }}>
+          <p style={{ color: 'var(--color-error)', fontWeight: 600, marginBottom: '4px' }}>
+            Tienda temporalmente cerrada para pedidos
+          </p>
+          <p style={{ color: 'var(--color-text-3)', fontSize: '0.85rem', margin: 0 }}>
+            Puedes explorar nuestros productos, pero los pedidos online no están disponibles en este momento.
+          </p>
+        </div>
+      )}
 
       <Suspense fallback={<div style={{ padding: '60px', textAlign: 'center', color: 'var(--color-text-4)' }}>Cargando catálogo…</div>}>
         <CatalogoClient

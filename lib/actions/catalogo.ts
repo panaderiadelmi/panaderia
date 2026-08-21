@@ -18,6 +18,7 @@ function parseForm(formData: FormData) {
     disponible: formData.get('disponible') === 'on',
     stockDiario: formData.get('stockDiario') ? parseInt(formData.get('stockDiario') as string) : null,
     destacado: formData.get('destacado') === 'on',
+    mercados: ['web', 'tienda', 'mayorista'].filter(m => formData.get(`mercado_${m}`) === 'on'),
     imagenes: (formData.get('imagenUrl') as string) ? [(formData.get('imagenUrl') as string)] : [],
     orden: parseInt((formData.get('orden') as string) ?? '99') || 99,
   };
