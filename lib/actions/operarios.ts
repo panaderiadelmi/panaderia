@@ -4,7 +4,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import type { CategoriaOperario, TipoContrato, TipoHoras } from '@/lib/types';
+import type { CategoriaOperario, TipoContrato, TipoHoras, TipoAusencia } from '@/lib/types';
 
 // ── Operarios ─────────────────────────────────────────────────────────────────
 
@@ -119,4 +119,47 @@ export async function eliminarHorario(id: string, _fd?: FormData) {
   await adminDb.collection('horarios').doc(id).delete();
   revalidatePath('/admin/horarios');
   redirect('/admin/horarios?eliminado=1');
+}
+
+// ── Ausencias ─────────────────────────────────────────────────────────────────
+
+export async function crearAusencia(operarioId: string, formData: FormData) {
+  const tipo  = formData.get('tipo')  as TipoAusencia;
+  const desde = formData.get('desde') as string;
+  const hasta = formData.get('hasta') as string;
+  const notas = ((formData.get('notas') as string) ?? '').trim();
+
+  const opSnap = await adminDb.collection('operarios').doc(operarioId).get();
+  const opData = opSnap.data() ?? {};
+  const operarioNombre = `${opData.nombre ?? ''} ${opData.apellidos ?? ''}`.trim();
+
+  await adminDb.collection('ausencias').add({
+    operarioId, operarioNombre, tipo, desde, hasta, notas,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  revalidatePath(`/admin/operarios/${operarioId}`);
+  redirect(`/admin/operarios/${operarioId}?ausencia=creada`);
+}
+
+export async function actualizarAusencia(ausenciaId: string, operarioId: string, formData: FormData) {
+  const tipo  = formData.get('tipo')  as TipoAusencia;
+  const desde = formData.get('desde') as string;
+  const hasta = formData.get('hasta') as string;
+  const notas = ((formData.get('notas') as string) ?? '').trim();
+
+  await adminDb.collection('ausencias').doc(ausenciaId).update({
+    tipo, desde, hasta, notas,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  revalidatePath(`/admin/operarios/${operarioId}`);
+  redirect(`/admin/operarios/${operarioId}?ausencia=editada`);
+}
+
+export async function eliminarAusencia(ausenciaId: string, operarioId: string, _fd?: FormData) {
+  await adminDb.collection('ausencias').doc(ausenciaId).delete();
+  revalidatePath(`/admin/operarios/${operarioId}`);
+  redirect(`/admin/operarios/${operarioId}?ausencia=eliminada`);
 }

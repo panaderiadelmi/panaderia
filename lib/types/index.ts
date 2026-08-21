@@ -318,6 +318,37 @@ export const TIPOS_HORAS: Record<TipoHoras, string> = {
   festivas:   'Festivas / Festivo',
 };
 
+export type TipoAusencia =
+  | 'vacaciones'
+  | 'baja_medica'
+  | 'baja_laboral'
+  | 'ausencia_justificada'
+  | 'ausencia_no_justificada'
+  | 'permiso_retribuido'
+  | 'otro';
+
+export const TIPOS_AUSENCIA: Record<TipoAusencia, { label: string; color: string; border: string }> = {
+  vacaciones:              { label: 'Vacaciones',              color: '#38BDF8', border: 'rgba(56,189,248,0.3)' },
+  baja_medica:             { label: 'Baja médica',             color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  baja_laboral:            { label: 'Baja laboral',            color: '#FB923C', border: 'rgba(251,146,60,0.3)'  },
+  ausencia_justificada:    { label: 'Ausencia justificada',    color: '#FBBF24', border: 'rgba(251,191,36,0.3)'  },
+  ausencia_no_justificada: { label: 'Ausencia no justificada', color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  permiso_retribuido:      { label: 'Permiso retribuido',      color: '#4ADE80', border: 'rgba(74,222,128,0.3)'  },
+  otro:                    { label: 'Otro',                    color: '#A78BFA', border: 'rgba(167,139,250,0.3)' },
+};
+
+export interface Ausencia {
+  id: string;
+  operarioId: string;
+  operarioNombre: string;
+  tipo: TipoAusencia;
+  desde: string;
+  hasta: string;
+  notas?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface Operario {
   id: string;
   nombre: string;
