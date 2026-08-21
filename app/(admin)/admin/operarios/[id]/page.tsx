@@ -29,13 +29,15 @@ export default async function EditarOperarioPage({
 }) {
   const [snap, ausenciasSnap] = await Promise.all([
     adminDb.collection('operarios').doc(params.id).get(),
-    adminDb.collection('ausencias').where('operarioId', '==', params.id).orderBy('desde', 'desc').get(),
+    adminDb.collection('ausencias').where('operarioId', '==', params.id).get(),
   ]);
 
   if (!snap.exists) notFound();
 
   const o = { id: snap.id, ...snap.data() } as Operario;
-  const ausencias = ausenciasSnap.docs.map(d => ({ id: d.id, ...d.data() }) as Ausencia);
+  const ausencias = ausenciasSnap.docs
+    .map(d => ({ id: d.id, ...d.data() }) as Ausencia)
+    .sort((a, b) => b.desde.localeCompare(a.desde));
 
   return (
     <>

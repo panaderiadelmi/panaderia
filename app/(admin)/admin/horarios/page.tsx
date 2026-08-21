@@ -35,8 +35,10 @@ async function getData(operarioId?: string, desde?: string, hasta?: string) {
 
   let ausencias: Ausencia[] = [];
   if (operarioId) {
-    const ausSnap = await adminDb.collection('ausencias').where('operarioId', '==', operarioId).orderBy('desde', 'desc').get();
-    ausencias = ausSnap.docs.map(d => ({ id: d.id, ...d.data() }) as Ausencia);
+    const ausSnap = await adminDb.collection('ausencias').where('operarioId', '==', operarioId).get();
+    ausencias = ausSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }) as Ausencia)
+      .sort((a, b) => b.desde.localeCompare(a.desde));
   }
 
   if (operarioId) horarios = horarios.filter(h => h.operarioId === operarioId);
