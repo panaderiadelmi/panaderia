@@ -4,6 +4,7 @@ import { actualizarOperario, eliminarAusencia } from '@/lib/actions/operarios';
 import { DeleteButton } from '@/components/admin/DeleteButton';
 import { PrintButton } from '@/components/admin/PrintButton';
 import { PrintHeader } from '@/components/admin/PrintHeader';
+import { JornadaFields } from '@/components/admin/JornadaFields';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -41,13 +42,6 @@ export default async function EditarOperarioPage({
   const ausencias = ausenciasSnap.docs
     .map(d => ({ id: d.id, ...d.data() }) as Ausencia)
     .sort((a, b) => b.desde.localeCompare(a.desde));
-
-  const horasMensuales = o.jornadaHorasDiarias && o.jornadaDiasMensuales
-    ? Math.round(o.jornadaHorasDiarias * o.jornadaDiasMensuales * 10) / 10
-    : o.horasSemanales
-      ? Math.round(o.horasSemanales * 52 / 12 * 10) / 10
-      : null;
-  const horasAnuales = o.horasSemanales ? Math.round(o.horasSemanales * 52 * 10) / 10 : null;
 
   return (
     <>
@@ -159,46 +153,14 @@ export default async function EditarOperarioPage({
           </div>
         </div>
 
-        {/* Jornada contratada */}
-        <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Jornada contratada
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
-            <div>
-              <label className="form-label">Horas semanales</label>
-              <input name="horasSemanales" type="number" step="0.5" min="0" max="40" className="form-input" defaultValue={o.horasSemanales ?? ''} placeholder="40" />
-            </div>
-            <div>
-              <label className="form-label">Días por semana</label>
-              <input name="jornadaDiasSemanales" type="number" step="1" min="1" max="7" className="form-input" defaultValue={o.jornadaDiasSemanales ?? ''} placeholder="5" />
-            </div>
-            <div>
-              <label className="form-label">Días por mes</label>
-              <input name="jornadaDiasMensuales" type="number" step="1" min="1" max="31" className="form-input" defaultValue={o.jornadaDiasMensuales ?? ''} placeholder="22" />
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
-            <div>
-              <label className="form-label">Hora entrada habitual</label>
-              <input name="jornadaEntrada" type="time" className="form-input" defaultValue={o.jornadaEntrada ?? ''} />
-            </div>
-            <div>
-              <label className="form-label">Hora salida habitual</label>
-              <input name="jornadaSalida" type="time" className="form-input" defaultValue={o.jornadaSalida ?? ''} />
-            </div>
-            <div>
-              <label className="form-label">Horas diarias</label>
-              <input name="jornadaHorasDiarias" type="number" step="0.5" min="0" max="24" className="form-input" defaultValue={o.jornadaHorasDiarias ?? ''} placeholder="8" />
-            </div>
-          </div>
-          {(horasMensuales || horasAnuales) && (
-            <div style={{ display: 'flex', gap: '24px', padding: '12px 16px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', fontSize: '0.82rem', color: 'var(--color-text-3)' }}>
-              {horasMensuales && <span>Horas/mes estimadas: <strong style={{ color: 'var(--color-text-1)' }}>{horasMensuales} h</strong></span>}
-              {horasAnuales  && <span>Horas/año estimadas: <strong style={{ color: 'var(--color-text-1)' }}>{horasAnuales} h</strong></span>}
-            </div>
-          )}
-        </div>
+        <JornadaFields defaultValues={{
+          horasSemanales:       o.horasSemanales,
+          jornadaDiasSemanales: o.jornadaDiasSemanales,
+          jornadaDiasMensuales: o.jornadaDiasMensuales,
+          jornadaEntrada:       o.jornadaEntrada,
+          jornadaSalida:        o.jornadaSalida,
+          jornadaHorasDiarias:  o.jornadaHorasDiarias,
+        }} />
 
         {/* Notas */}
         <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>

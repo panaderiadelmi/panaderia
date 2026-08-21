@@ -1,5 +1,6 @@
 import { crearOperario } from '@/lib/actions/operarios';
 import { CATEGORIAS_OPERARIO, TIPOS_CONTRATO } from '@/lib/types';
+import { JornadaFields } from '@/components/admin/JornadaFields';
 import Link from 'next/link';
 
 export const metadata = { title: 'Nuevo operario — Admin' };
@@ -106,40 +107,7 @@ function OperarioFormFields({ defaultValues }: { defaultValues?: Record<string, 
         </div>
       </div>
 
-      {/* Jornada contratada */}
-      <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--color-text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          Jornada contratada
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
-          <div>
-            <label className="form-label">Horas semanales</label>
-            <input name="horasSemanales" type="number" step="0.5" min="0" max="40" className="form-input" defaultValue={v.horasSemanales as string ?? ''} placeholder="40" />
-          </div>
-          <div>
-            <label className="form-label">Días por semana</label>
-            <input name="jornadaDiasSemanales" type="number" step="1" min="1" max="7" className="form-input" defaultValue={v.jornadaDiasSemanales as string ?? ''} placeholder="5" />
-          </div>
-          <div>
-            <label className="form-label">Días por mes</label>
-            <input name="jornadaDiasMensuales" type="number" step="1" min="1" max="31" className="form-input" defaultValue={v.jornadaDiasMensuales as string ?? ''} placeholder="22" />
-          </div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
-          <div>
-            <label className="form-label">Hora entrada habitual</label>
-            <input name="jornadaEntrada" type="time" className="form-input" defaultValue={v.jornadaEntrada as string ?? ''} />
-          </div>
-          <div>
-            <label className="form-label">Hora salida habitual</label>
-            <input name="jornadaSalida" type="time" className="form-input" defaultValue={v.jornadaSalida as string ?? ''} />
-          </div>
-          <div>
-            <label className="form-label">Horas diarias</label>
-            <input name="jornadaHorasDiarias" type="number" step="0.5" min="0" max="24" className="form-input" defaultValue={v.jornadaHorasDiarias as string ?? ''} placeholder="8" />
-          </div>
-        </div>
-      </div>
+      <JornadaFields />
 
       {/* Notas */}
       <div className="glass-card" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
