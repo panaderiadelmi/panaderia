@@ -132,7 +132,7 @@ export default async function HorariosPage({
             <Link href="/admin/horarios" className="btn-ghost" style={{ padding: '9px 18px', fontSize: '0.85rem' }}>Limpiar</Link>
           )}
         </div>
-        {operarioSel && (
+        {operarioSel ? (
           <Link
             href={`/admin/operarios/${operarioSel.id}/ausencias/nueva`}
             className="btn-ghost no-print"
@@ -140,6 +140,14 @@ export default async function HorariosPage({
           >
             + Registrar incidencia
           </Link>
+        ) : (
+          <span
+            className="btn-ghost no-print"
+            title="Selecciona un operario para registrar una incidencia"
+            style={{ padding: '9px 18px', fontSize: '0.85rem', marginLeft: 'auto', opacity: 0.4, cursor: 'default' }}
+          >
+            + Registrar incidencia
+          </span>
         )}
       </form>
 
