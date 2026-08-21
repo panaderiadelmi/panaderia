@@ -323,22 +323,35 @@ export const TIPOS_HORAS: Record<TipoHoras, string> = {
 
 export type TipoAusencia =
   | 'vacaciones'
-  | 'baja_medica'
-  | 'baja_laboral'
-  | 'ausencia_justificada'
-  | 'ausencia_no_justificada'
+  | 'baja_comun'
+  | 'baja_medica'          // alias legacy — mismo concepto que baja_comun
+  | 'accidente_laboral'
+  | 'baja_laboral'         // alias legacy
+  | 'falta_justificada'
+  | 'ausencia_justificada' // alias legacy
+  | 'falta_injustificada'
+  | 'ausencia_no_justificada' // alias legacy
   | 'permiso_retribuido'
   | 'otro';
 
 export const TIPOS_AUSENCIA: Record<TipoAusencia, { label: string; color: string; border: string }> = {
-  vacaciones:              { label: 'Vacaciones',              color: '#38BDF8', border: 'rgba(56,189,248,0.3)' },
-  baja_medica:             { label: 'Baja médica',             color: '#F87171', border: 'rgba(248,113,113,0.3)' },
-  baja_laboral:            { label: 'Baja laboral',            color: '#FB923C', border: 'rgba(251,146,60,0.3)'  },
-  ausencia_justificada:    { label: 'Ausencia justificada',    color: '#FBBF24', border: 'rgba(251,191,36,0.3)'  },
-  ausencia_no_justificada: { label: 'Ausencia no justificada', color: '#F87171', border: 'rgba(248,113,113,0.3)' },
-  permiso_retribuido:      { label: 'Permiso retribuido',      color: '#4ADE80', border: 'rgba(74,222,128,0.3)'  },
-  otro:                    { label: 'Otro',                    color: '#A78BFA', border: 'rgba(167,139,250,0.3)' },
+  vacaciones:              { label: 'Vacaciones',                       color: '#38BDF8', border: 'rgba(56,189,248,0.3)'  },
+  baja_comun:              { label: 'Baja común / Enfermedad (IT)',      color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  baja_medica:             { label: 'Baja común / Enfermedad (IT)',      color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  accidente_laboral:       { label: 'Accidente laboral (IT prof.)',      color: '#FB923C', border: 'rgba(251,146,60,0.3)'  },
+  baja_laboral:            { label: 'Accidente laboral (IT prof.)',      color: '#FB923C', border: 'rgba(251,146,60,0.3)'  },
+  falta_justificada:       { label: 'Falta justificada',                 color: '#FBBF24', border: 'rgba(251,191,36,0.3)'  },
+  ausencia_justificada:    { label: 'Falta justificada',                 color: '#FBBF24', border: 'rgba(251,191,36,0.3)'  },
+  falta_injustificada:     { label: 'Falta injustificada',               color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  ausencia_no_justificada: { label: 'Falta injustificada',               color: '#F87171', border: 'rgba(248,113,113,0.3)' },
+  permiso_retribuido:      { label: 'Permiso retribuido',                color: '#4ADE80', border: 'rgba(74,222,128,0.3)'  },
+  otro:                    { label: 'Otro',                              color: '#A78BFA', border: 'rgba(167,139,250,0.3)' },
 };
+
+export const TIPOS_AUSENCIA_NUEVOS: TipoAusencia[] = [
+  'vacaciones', 'baja_comun', 'accidente_laboral',
+  'falta_justificada', 'falta_injustificada', 'permiso_retribuido', 'otro',
+];
 
 export interface Ausencia {
   id: string;

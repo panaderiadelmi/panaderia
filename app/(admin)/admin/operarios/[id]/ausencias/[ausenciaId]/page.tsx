@@ -1,5 +1,5 @@
 import { adminDb } from '@/lib/firebase/admin';
-import { type Operario, type Ausencia, TIPOS_AUSENCIA } from '@/lib/types';
+import { type Operario, type Ausencia, TIPOS_AUSENCIA, TIPOS_AUSENCIA_NUEVOS } from '@/lib/types';
 import { actualizarAusencia } from '@/lib/actions/operarios';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -39,8 +39,8 @@ export default async function EditarAusenciaPage({
           <div>
             <label className="form-label">Tipo de incidencia *</label>
             <select name="tipo" required className="form-input" defaultValue={a.tipo}>
-              {Object.entries(TIPOS_AUSENCIA).map(([k, cfg]) => (
-                <option key={k} value={k}>{cfg.label}</option>
+              {TIPOS_AUSENCIA_NUEVOS.map(k => (
+                <option key={k} value={k}>{TIPOS_AUSENCIA[k].label}</option>
               ))}
             </select>
           </div>
