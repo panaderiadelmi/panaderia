@@ -1,26 +1,28 @@
 import { adminDb } from '@/lib/firebase/admin';
-import { type Operario, CATEGORIAS_OPERARIO, TIPOS_CONTRATO } from '@/lib/types';
+import { type Operario, type ConfiguracionEmpresa, CATEGORIAS_OPERARIO, TIPOS_CONTRATO } from '@/lib/types';
 import { eliminarOperario } from '@/lib/actions/operarios';
 import { DeleteButton } from '@/components/admin/DeleteButton';
 import { PrintButton } from '@/components/admin/PrintButton';
+import { PrintHeader } from '@/components/admin/PrintHeader';
 import Link from 'next/link';
 
 export const metadata = { title: 'Operarios — Admin' };
-
-async function getOperarios(): Promise<Operario[]> {
-  const snap = await adminDb.collection('operarios').orderBy('apellidos').get();
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Operario);
-}
 
 export default async function OperariosPage({
   searchParams,
 }: {
   searchParams: { creado?: string; editado?: string; eliminado?: string };
 }) {
-  const operarios = await getOperarios();
+  const [snap, cfgSnap] = await Promise.all([
+    adminDb.collection('operarios').orderBy('apellidos').get(),
+    adminDb.collection('configuracion').doc('empresa').get(),
+  ]);
+  const operarios = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Operario);
+  const cfg = (cfgSnap.data() ?? {}) as Partial<ConfiguracionEmpresa>;
 
   return (
     <>
+      <PrintHeader cfg={cfg} titulo="Listado de operarios" />
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Operarios</h1>

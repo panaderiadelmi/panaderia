@@ -379,6 +379,13 @@ export interface Operario {
   tipoContrato: TipoContrato;
   activo: boolean;
   notas?: string;
+  // Jornada contratada
+  horasSemanales?: number;
+  jornadaEntrada?: string;
+  jornadaSalida?: string;
+  jornadaHorasDiarias?: number;
+  jornadaDiasSemanales?: number;
+  jornadaDiasMensuales?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

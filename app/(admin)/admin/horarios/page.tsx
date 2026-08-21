@@ -1,8 +1,9 @@
 import { adminDb } from '@/lib/firebase/admin';
-import { type HorarioOperario, type Operario, type Ausencia, TIPOS_HORAS, TIPOS_AUSENCIA } from '@/lib/types';
+import { type HorarioOperario, type Operario, type Ausencia, type ConfiguracionEmpresa, TIPOS_HORAS, TIPOS_AUSENCIA } from '@/lib/types';
 import { eliminarHorario } from '@/lib/actions/operarios';
 import { DeleteButton } from '@/components/admin/DeleteButton';
 import { PrintButton } from '@/components/admin/PrintButton';
+import { PrintHeader } from '@/components/admin/PrintHeader';
 import Link from 'next/link';
 
 export const metadata = { title: 'Horarios — Admin' };
@@ -63,7 +64,11 @@ export default async function HorariosPage({
   };
 }) {
   const { operarioId, desde, hasta } = searchParams;
-  const { horarios, operarios, ausencias } = await getData(operarioId, desde, hasta);
+  const [{ horarios, operarios, ausencias }, cfgSnap] = await Promise.all([
+    getData(operarioId, desde, hasta),
+    adminDb.collection('configuracion').doc('empresa').get(),
+  ]);
+  const cfg = (cfgSnap.data() ?? {}) as Partial<ConfiguracionEmpresa>;
 
   const totalTrabajadas = horarios.reduce((s, h) => s + horasEntreTiempos(h.horarioInicio, h.horarioFin), 0);
   const totalExtras     = horarios.reduce((s, h) => s + (h.horasExtras || 0), 0);
@@ -91,6 +96,7 @@ export default async function HorariosPage({
 
   return (
     <>
+      <PrintHeader cfg={cfg} titulo={operarioSel ? `Horarios: ${operarioSel.nombre} ${operarioSel.apellidos}` : 'Horarios e incidencias'} />
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-display)' }}>Horarios e incidencias</h1>

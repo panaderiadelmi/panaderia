@@ -8,6 +8,17 @@ import type { CategoriaOperario, TipoContrato, TipoHoras, TipoAusencia } from '@
 
 // ── Operarios ─────────────────────────────────────────────────────────────────
 
+function parseJornada(formData: FormData) {
+  return {
+    horasSemanales:       parseFloat(formData.get('horasSemanales')       as string) || null,
+    jornadaEntrada:       (formData.get('jornadaEntrada')                 as string) || null,
+    jornadaSalida:        (formData.get('jornadaSalida')                  as string) || null,
+    jornadaHorasDiarias:  parseFloat(formData.get('jornadaHorasDiarias')  as string) || null,
+    jornadaDiasSemanales: parseInt(formData.get('jornadaDiasSemanales')   as string) || null,
+    jornadaDiasMensuales: parseInt(formData.get('jornadaDiasMensuales')   as string) || null,
+  };
+}
+
 export async function crearOperario(formData: FormData) {
   const nombre          = (formData.get('nombre')          as string).trim();
   const apellidos       = (formData.get('apellidos')       as string).trim();
@@ -25,6 +36,7 @@ export async function crearOperario(formData: FormData) {
     nombre, apellidos, categoria, telefono, email,
     nss, numeroCuenta, fechaNacimiento, fechaInicio, tipoContrato,
     notas, activo: true,
+    ...parseJornada(formData),
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   });
@@ -51,6 +63,7 @@ export async function actualizarOperario(id: string, formData: FormData) {
     nombre, apellidos, categoria, telefono, email,
     nss, numeroCuenta, fechaNacimiento, fechaInicio, tipoContrato,
     activo, notas,
+    ...parseJornada(formData),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
